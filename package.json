@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Basic configuration for Rollup and other useful things",
   "main": "dist/main.js",
+  "bin": {
+    "create-rollup-project": "dist/main.js"
+  },
   "scripts": {
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "build": "cross-env NODE_ENV=production rollup -c",
@@ -81,15 +84,10 @@
     "enquirer": "^1.0.3",
     "fs-extra": "^7.0.0",
     "handlebars": "^4.0.12",
-    "lodash": "^4.17.11",
-    "mkdirp": "^0.5.1",
-    "ncp": "^2.0.0",
     "parse-git-config": "^2.0.3",
     "prompt-checkbox": "^2.2.0",
-    "prompt-choices": "^5.0.0",
     "prompt-confirm": "^2.0.4",
     "prompt-list": "^3.2.0",
-    "rimraf": "^2.6.2",
     "tmp": "^0.0.33"
   }
 }

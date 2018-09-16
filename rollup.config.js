@@ -21,9 +21,9 @@ export default {
   // output bundle file
   output: {
     file: 'dist/main.js',
-    format: 'cjs' // usually the best choice
+    format: 'cjs', // usually the best choice
     // add banner for command line tool
-    /* banner: "#! /usr/bin/env node" */
+    banner: '#! /usr/bin/env node'
   },
   context: null, // silence 'this is undefined' warning
   plugins: [

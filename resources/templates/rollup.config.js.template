@@ -1,5 +1,6 @@
 {{#if features.babel}}import babel from 'rollup-plugin-babel'{{/if}}
 import resolve from 'rollup-plugin-node-resolve'
+import builtins from 'rollup-plugin-node-builtins'
 import commonjs from 'rollup-plugin-commonjs'
 import filesize from 'rollup-plugin-filesize'
 import progress from 'rollup-plugin-progress'
@@ -31,8 +32,13 @@ export default {
     * only be babel-runtime and everything else should be left as
     * an external dependency.
     */
-    resolve(),
     json(), // transforms imported JSON files to JavaScript
+    builtins(),
+    commonjs({
+      include: 'node_modules/**',
+      exclude: ['src/**', 'test/**']
+    }),
+    resolve(),
     {{#if features.babel}}
     babel({
       /*
@@ -51,10 +57,6 @@ export default {
       ]
     }),
     {{/if}}
-    commonjs({
-      include: 'node_modules/**',
-      exclude: [ 'src/**', 'test/**' ]
-    }),
     production && uglify(), // uglify only in production
     filesize()
   ]
