@@ -1,0 +1,9 @@
+const message = 'Hello {{package.name}}!'
+
+console.log(message)
+
+{{#if features.babel}}
+export default message
+{{else}}
+module.exports = message
+{{/if}}

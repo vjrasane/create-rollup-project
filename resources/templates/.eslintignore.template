@@ -1,0 +1,6 @@
+coverage/**
+dist/**
+node_modules/**
+{{#if features.flow}}
+flow-typed/**
+{{/if}}

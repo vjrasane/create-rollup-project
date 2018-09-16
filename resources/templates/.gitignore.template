@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+{{#if features.rollup}}
+dist/
+*.tgz
+{{/if}}
+{{#if features.flow}}
+flow-typed/
+{{/if}}
+package-lock.json

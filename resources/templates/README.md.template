@@ -1,0 +1,79 @@
+# {{package.name}}
+
+by {{package.author}}
+
+{{#if features.license}}{{#if (and package.license licenseEnc)}}[![License][License badge]][License] {{else}}
+<!-- 
+[![License][License badge]][License] 
+-->
+{{/if}}{{/if}}{{#if features.travis}}{{#if projectLink}}[![Build Status][travis badge]][travis] {{else}}
+<!-- 
+[![Build Status][travis badge]][travis] 
+-->
+{{/if}}{{/if}}{{#if features.coveralls}}{{#if projectLink}}[![Coverage Status][coverage badge]][coveralls] {{else}}
+<!-- 
+[![Coverage Status][coverage badge]][coveralls] 
+-->
+{{/if}}{{/if}}{{#if features.publish}}[![npm version][npm badge]][npm]{{/if}}
+
+## Table of contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+
+## Installation
+
+#### NPM
+
+```
+npm install --save {{package.name}}
+```
+
+#### Yarn
+
+```
+yarn add {{package.name}}
+```
+
+## Usage
+
+## API
+
+{{#if features.coveralls}}
+{{#if projectLink}}
+[Coverage badge]: https://coveralls.io/repos/github/{{projectLink}}/badge.svg?service=github
+[Coveralls]: https://coveralls.io/github/{{projectLink}}
+{{else}}
+<!--
+[Coverage badge]: https://coveralls.io/repos/github/[project]/badge.svg?service=github 
+[Coveralls]: https://coveralls.io/github/[project] 
+-->
+{{/if}}
+{{/if}}
+{{#if features.license}}
+{{#if (and package.license licenseEnc)}}
+[License badge]: https://img.shields.io/badge/License-{{licenseEnc}}-blue.svg
+[License]: https://opensource.org/licenses/{{package.license}}
+{{else}}
+<!--
+[License badge]: https://img.shields.io/badge/[license]-blue.svg
+[License]: https://opensource.org/licenses/[license]
+-->
+{{/if}}
+{{/if}}
+{{#if features.travis}}
+{{#if projectLink}}
+[Travis]: https://travis-ci.org/{{projectLink}}
+[Travis badge]: https://travis-ci.org/{{projectLink}}.svg?branch=master&service=github
+{{else}}
+<!--
+[Travis]: https://travis-ci.org/[project]
+[Travis badge]: https://travis-ci.org/[project]
+-->
+{{/if}}
+{{/if}}
+{{#if features.publish}}
+[npm badge]: https://badge.fury.io/js/{{package.name}}.svg?service=github
+[npm]: https://badge.fury.io/js/{{package.name}}
+{{/if}}

@@ -1,0 +1,60 @@
+{
+  "name": "{{package.name}}",
+  "version": "{{package.version}}",
+  "description": "{{package.description}}",
+  "main": "{{package.main}}",
+  {{#if package.scripts}}
+  "scripts": {
+  {{#each package.scripts}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+  {{/each}}
+  },
+  {{/if}}
+  {{#if package.author}}
+  "author": "{{package.author}}",
+  {{/if}}
+  {{#if package.license}}
+  "license": "{{package.license}}",
+  {{/if}}
+  {{#if package.repository}}
+  "repository": {
+    "type": "{{package.repository.type}}",
+    "url": "{{package.repository.url}}"
+  },
+  "bugs": {
+    "url": "{{package.repository.url}}/issues"
+  },
+  "homepage": "{{package.repository.url}}#readme",
+  {{/if}}
+  {{#if package.devDependencies}}
+  "devDependencies": {
+    {{#each package.devDependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  },
+  {{/if}}
+  {{#if features.standard}}
+  "standard": {
+    {{#if (or features.babel features.flow)}}
+    "parser": "babel-eslint",
+    {{/if}}
+    {{#if features.flow}}
+    "plugins": [
+      "flowtype"
+    ],
+    "ignore": [
+      "flow-typed/**"
+    ],
+    {{/if}}
+    "env": [
+      {{#if features.jest}}
+      "jest",
+      {{/if}}
+      "node"
+    ]
+  },
+  {{/if}}
+  "keywords": [
+    "library"
+  ]
+}

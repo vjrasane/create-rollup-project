@@ -1,0 +1,21 @@
+language: node_js
+node_js: 9
+{{#if (or features.coveralls features.rollup)}}
+after_success:
+{{/if}}
+{{#if features.coveralls}}
+- yarn coveralls
+{{/if}}
+{{#if features.rollup}}
+- yarn build
+{{/if}}
+{{#if features.publish}}
+deploy:
+  provider: npm
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+{{/if}}
+cache: yarn
+    
