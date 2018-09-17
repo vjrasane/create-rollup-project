@@ -8,7 +8,7 @@ import deepmerge from 'deepmerge'
 import { dirSync } from 'tmp'
 import { template } from './template'
 import { mkdirpSync, removeSync, copySync } from 'fs-extra'
-import prompts, { confirm, allFeatures } from './prompts'
+import { prompts, confirm, allFeatures } from './prompts'
 import { info, warn, divider } from './logging'
 
 import execFeats from './features'
@@ -22,7 +22,9 @@ const GIT_ORIGIN = 'remote "origin"'
 
 export default async (args: Arguments): Promise<void> => {
   const processDir: string = process.cwd()
-  const dirPath: string = isAbsolute(args.dir) ? args.dir : join(processDir, args.dir)
+  const dirPath: string = isAbsolute(args.dir)
+    ? args.dir
+    : join(processDir, args.dir)
 
   info("Target directory '" + dirPath + "'")
   info('Creating temporary directory')
@@ -45,11 +47,11 @@ export default async (args: Arguments): Promise<void> => {
     const author: string = userInfo().username
     const description: string = pkgName + ' by ' + author
 
-    const gitUrl = (): string => {
+    const gitUrl = (name: string, author: string, log: boolean): string => {
       const gitConf: Config = git.sync({ cwd: dirPath, path: '.git/config' })
       let url: string = ''
       if (GIT_ORIGIN in gitConf) {
-        info('Found git configuration in target directory')
+        log && info('Found git configuration in target directory')
         url = gitConf[GIT_ORIGIN].url
         // replace 'git@' with protocol
         if (url.startsWith('git@')) {
@@ -66,7 +68,7 @@ export default async (args: Arguments): Promise<void> => {
           url = url + '.git'
         }
       } else {
-        url = ['git+https://github.com', author, pkgName + '.git'].join('/')
+        url = ['git+https://github.com', author, name + '.git'].join('/')
       }
       return url
     }
@@ -86,7 +88,7 @@ export default async (args: Arguments): Promise<void> => {
         dependencyPkgs: [],
         repository: {
           type: 'git',
-          url: gitUrl()
+          url: gitUrl(pkgName, author, true)
         }
       },
       year: new Date().getFullYear(),
@@ -95,10 +97,9 @@ export default async (args: Arguments): Promise<void> => {
     }
 
     const prompt = async () => {
-      const enquirer = prompts(defaultOpts)
-
+      const basicEnq = prompts(defaultOpts)
       const questions = async () => {
-        const answers: Object = await enquirer.ask([
+        const answers: Object = await basicEnq.ask([
           'projectName',
           'projectVersion',
           'projectType',
@@ -106,44 +107,46 @@ export default async (args: Arguments): Promise<void> => {
           'features'
         ])
 
-        const answerOpts: Options = {
+        const answerOpts: Options = deepmerge(defaultOpts, {
           package: {
             name: answers.projectName,
             version: answers.projectVersion,
-            author: answers.authorName
+            author: answers.authorName,
+            description: answers.projectName + ' by ' + answers.authorName,
+            repository: {
+              type: 'git',
+              url: gitUrl(answers.projectName, answers.authorName)
+            }
           },
+          featureList: answers.features,
           projectType: answers.projectType
-        }
+        })
+
+        const detailsEnq = prompts(answerOpts)
 
         if (answers.features.includes('github')) {
-          const { githubUrl }: string = await enquirer.ask('githubUrl')
-          answerOpts.package.repository = {
-            type: 'git',
-            url: githubUrl
-          }
+          const { githubUrl }: string = await detailsEnq.ask('githubUrl')
+          answerOpts.package.repository.url = githubUrl
           answerOpts.projectLink = githubUrl
             .split('/') // split the URI to path parts
             .splice(-2) // take two last parts
             .join('/') // combine them back to a string
         } else {
-          delete defaultOpts.package.repository
+          delete answerOpts.package.repository
         }
 
         if (answers.features.includes('license')) {
-          let { license }: string = await enquirer.ask('license')
+          let { license }: string = await detailsEnq.ask('license')
           if (license === 'Other') {
-            license = await enquirer.ask('otherLicense').otherLicense
+            license = await detailsEnq.ask('otherLicense').otherLicense
           }
           answerOpts.package.license = license
         } else {
-          delete defaultOpts.package.license
+          delete answerOpts.package.license
         }
 
-        const merged: Options = deepmerge(defaultOpts, answerOpts)
-        merged.featureList = answers.features
-
         divider()
-        return merged
+        return answerOpts
       }
 
       if (existsSync(dirPath)) {
@@ -160,7 +163,7 @@ export default async (args: Arguments): Promise<void> => {
         divider()
       }
 
-      const { howConfig } = await enquirer.ask(['howConfig'])
+      const { howConfig } = await basicEnq.ask(['howConfig'])
 
       switch (howConfig) {
         case 'Answer questions':
@@ -173,7 +176,6 @@ export default async (args: Arguments): Promise<void> => {
     }
 
     const userOpts = args.defaults ? defaultOpts : await prompt()
-
     // set feature flags
     userOpts.features = {}
     userOpts.featureList.forEach(f => {

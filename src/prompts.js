@@ -5,6 +5,8 @@ import list from 'prompt-list'
 import checkbox from 'prompt-checkbox'
 import Confirm from 'prompt-confirm'
 
+import type { Options } from './types'
+
 export const confirm = (question: string): Promise<boolean> =>
   new Confirm(question).run()
 
@@ -26,7 +28,7 @@ export const allFeatures: Array<string> = [
   ...misc
 ]
 
-export default opts => {
+export const prompts = (opts: Options): Enquirer => {
   const enquirer: Enquirer = new Enquirer()
   // register additional prompt types
   enquirer.register('list', list)
@@ -50,14 +52,33 @@ export default opts => {
   enquirer.question('projectType', 'Project type?', {
     type: 'list',
     default: opts.projectType,
-    choices: [
-      'Library',
-      'Command Line Tool'
-    ]
+    choices: ['Library', 'Command Line Tool']
   })
   enquirer.question('authorName', 'Author name?', {
     default: opts.package.author
   })
+
+  const features: Array<string> = {
+    bundling,
+    style,
+    testing,
+    misc
+  }
+
+  enquirer.question('features', 'Features? (Space to (de)select)', {
+    type: 'checkbox',
+    radio: true,
+    default: [
+      ...opts.featureList,
+      'all',
+      'bundling',
+      'style',
+      'testing',
+      'misc'
+    ],
+    choices: features
+  })
+
   enquirer.question('githubUrl', 'Github URL?', {
     default: opts.package.repository.url
   })
@@ -76,18 +97,5 @@ export default opts => {
   })
   enquirer.question('otherLicense', 'Other license?')
 
-  const features: Array<string> = {
-    bundling,
-    style,
-    testing,
-    misc
-  }
-
-  enquirer.question('features', 'Features? (Space to (de)select)', {
-    type: 'checkbox',
-    radio: true,
-    default: [...opts.featureList, 'all', 'bundling', 'style', 'testing', 'misc'],
-    choices: features
-  })
   return enquirer
 }
