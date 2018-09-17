@@ -3,7 +3,9 @@
 import deepmerge from 'deepmerge'
 import { template } from '../template'
 
-export default (opts: Object): Object => {
+import type { Options } from '../types'
+
+export default (opts: Options): Options => {
   const dependencyPkgs: Array<string> = [
     'eslint',
     'eslint-config-standard',
@@ -15,7 +17,7 @@ export default (opts: Object): Object => {
   opts.features.standard && dependencyPkgs.push('eslint-plugin-standard')
   opts.features.flow && dependencyPkgs.push('eslint-plugin-flowtype')
 
-  const scripts: Object<string> = {
+  const scripts: { lint: string } = {
     lint: 'node_modules/.bin/eslint .'
   }
 
@@ -23,8 +25,8 @@ export default (opts: Object): Object => {
   template('.eslintignore.template', opts)
 
   return deepmerge(opts, {
+    dependencyPkgs,
     package: {
-      dependencyPkgs,
       scripts
     }
   })

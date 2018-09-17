@@ -1,14 +1,11 @@
-/* @flow */
-
+import deepmerge from 'deepmerge'
 import Enquirer from 'enquirer'
 import list from 'prompt-list'
 import checkbox from 'prompt-checkbox'
-import Confirm from 'prompt-confirm'
+
+import { getGitUrl } from './defaults'
 
 import type { Options } from './types'
-
-export const confirm = (question: string): Promise<boolean> =>
-  new Confirm(question).run()
 
 const bundling: Array<string> = ['rollup', 'babel']
 const style: Array<string> = ['eslint', 'standard', 'flow']
@@ -58,7 +55,7 @@ export const prompts = (opts: Options): Enquirer => {
     default: opts.package.author
   })
 
-  const features: Array<string> = {
+  const features: Object = {
     bundling,
     style,
     testing,
@@ -99,3 +96,66 @@ export const prompts = (opts: Options): Enquirer => {
 
   return enquirer
 }
+
+const getUserOpts = async (defaultOpts: Options): Options => {
+  let enquirer = prompts(defaultOpts)
+
+  const answers: Object = await enquirer.ask([
+    'projectName',
+    'projectVersion',
+    'projectType',
+    'authorName',
+    'features'
+  ])
+
+  const answerOpts: Options = deepmerge(defaultOpts, {
+    package: {
+      name: answers.projectName,
+      version: answers.projectVersion,
+      author: answers.authorName,
+      description: answers.projectName + ' by ' + answers.authorName
+    },
+    projectType: answers.projectType
+  })
+
+  // set git repository according to previous answers
+  answerOpts.package.repository = {
+    type: 'git',
+    url: getGitUrl(answerOpts)
+  }
+
+  // must overwrite entire array, otherwise its merged
+  answerOpts.featureList = answers.features
+
+  // update enquirer so that default values are set correctly
+  enquirer = prompts(answerOpts)
+
+  // ask github url if feature is enabled
+  if (answers.features.includes('github')) {
+    const { githubUrl }: string = await enquirer.ask('githubUrl')
+    answerOpts.package.repository.url = githubUrl
+    answerOpts.projectLink = githubUrl
+      .split('/') // split the URI to path parts
+      .splice(-2) // take two last parts
+      .join('/') // combine them back to a string
+  } else {
+    // remove default repository if feature is disabled
+    delete answerOpts.package.repository
+  }
+
+  // ask license if feature is enabled
+  if (answers.features.includes('license')) {
+    let { license }: string = await enquirer.ask('license')
+    if (license === 'Other') {
+      license = await enquirer.ask('otherLicense').otherLicense
+    }
+    answerOpts.package.license = license
+  } else {
+    // remove default repository if feature is disabled
+    delete answerOpts.package.license
+  }
+
+  return answerOpts
+}
+
+export default (defaultOpts: Options): Options => getUserOpts(defaultOpts)

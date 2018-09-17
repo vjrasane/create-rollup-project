@@ -2,7 +2,9 @@
 
 import deepmerge from 'deepmerge'
 
-export default (opts: Object): Object => {
+import type { Options } from '../types'
+
+export default (opts: Options): Options => {
   const dependencyPkgs: Array<string> = [
     'babel-core',
     'babel-preset-env',
@@ -15,9 +17,5 @@ export default (opts: Object): Object => {
   opts.features.eslint && dependencyPkgs.push('babel-eslint')
   opts.features.flow && dependencyPkgs.push('babel-preset-flow')
 
-  return deepmerge(opts, {
-    package: {
-      dependencyPkgs
-    }
-  })
+  return deepmerge(opts, { dependencyPkgs })
 }

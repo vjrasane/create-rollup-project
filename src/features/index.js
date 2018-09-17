@@ -11,47 +11,45 @@ import license from './license'
 import { template, staticFile } from '../template'
 import { stdout } from '../logging'
 
-const dependencies = (dependencyPkgs: Array<string>): Function<Object> => (
-  opts: Object
-): Object => {
-  return deepmerge(opts, {
-    package: {
-      dependencyPkgs
-    }
-  })
+import type { Options } from '../types'
+
+const dependencies = (
+  dependencyPkgs: Array<string>
+): ((opts: Options) => Options) => (opts: Options): Options => {
+  return deepmerge(opts, { dependencyPkgs })
 }
 
-const scripts = (scripts: Object<string>): Function<Object> => (
-  opts: Object
-): Object =>
+const scripts = (scripts: Object): ((opts: Options) => Options) => (
+  opts: Options
+): Options =>
   deepmerge(opts, {
     package: {
       scripts
     }
   })
 
-const templates = (temps: Array<string>): Function<Object> => (
-  opts: Object
-): void => {
+const templates = (temps: Array<string>): ((opts: Options) => Options) => (
+  opts: Options
+): Options => {
   temps.forEach(t => template(t, opts))
   return opts
 }
 
-const statics = (statics: Array<string>): Function<Object> => (
-  opts: Object
-): void => {
+const statics = (statics: Array<string>): ((opts: Options) => Options) => (
+  opts: Options
+): Options => {
   statics.forEach(s => staticFile(s, opts))
   return opts
 }
 
-const chain = (funcs: Array<Function<Object>>): Function<Object> => (
-  opts: Object
-): Object => {
+const chain = (
+  funcs: Array<(opts: Options) => Options>
+): ((opts: Options) => Options) => (opts: Options): Options => {
   const res = funcs.reduce((acc, curr) => curr(acc), opts)
   return res
 }
 
-const features = {
+const features: Object = {
   rollup,
   babel,
   jest,
@@ -74,7 +72,7 @@ const features = {
   github: templates(['.gitignore.template'])
 }
 
-export default opts =>
+export default (opts: Options): Options =>
   Object.keys(features).reduce((acc, curr) => {
     if (curr in opts.features) {
       stdout(' * ' + curr)

@@ -42,8 +42,8 @@ const readLogo = (line: string): string => {
         type: Boolean
       },
       {
-        name: 'defaults',
-        type: Boolean
+        name: 'config',
+        alias: 'c'
       }
     ])
 

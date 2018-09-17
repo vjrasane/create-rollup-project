@@ -4,12 +4,14 @@ import { staticFile, template } from '../template'
 import { join, dirname } from 'path'
 import { existsSync } from 'fs'
 
-export default (opts: Object): Object => {
-  const license = opts.package.license
+import type { Options } from '../types'
 
-  const findLicense = (dir: string, handler: Function<void>): void => {
-    const resPath = join('licenses', license)
-    const absPath = join(dirname(dirname(module.filename)), 'resources', dir, resPath)
+export default (opts: Options): Options => {
+  const license: string = opts.package.license
+
+  const findLicense = (dir: string, handler: (path: string, opts: Options, name: string) => void): void => {
+    const resPath: string = join('licenses', license)
+    const absPath: string = join(dirname(dirname(module.filename)), 'resources', dir, resPath)
     if (existsSync(absPath)) {
       handler(resPath, opts, 'LICENSE')
     }

@@ -1,6 +1,6 @@
-import cliUsage from 'command-line-usage'
+import usage from 'command-line-usage'
 
-export default cliUsage([
+export default usage([
   {
     header: 'Overview',
     content:
@@ -9,9 +9,10 @@ export default cliUsage([
   {
     header: 'Synopsis',
     content: [
-      '$ create-rollup-project [{bold --target|-t}] {underline directory}',
-      '$ create-rollup-project [{bold --target|-t}] {underline directory} [{bold --dry-run}]',
-      '$ create-rollup-project [{bold --help|-h}]'
+      '$ create-rollup-project {underline directory}',
+      '$ create-rollup-project {bold --target} {underline directory}',
+      '$ create-rollup-project {underline directory} {bold --config} {underline prompt}|defaults|minimal',
+      '$ create-rollup-project {bold --help}'
     ]
   },
   {
@@ -30,9 +31,9 @@ export default cliUsage([
         typeLabel: '{underline directory}'
       },
       {
-        name: 'defaults',
-        description: 'Use default values without prompting user',
-        type: Boolean
+        name: 'config',
+        alias: 'c',
+        description: 'Configuration method'
       },
       {
         name: 'dry-run',

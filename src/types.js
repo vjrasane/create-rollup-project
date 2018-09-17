@@ -6,24 +6,28 @@ export type Package = {
   author: string,
   main?: string,
   scripts?: Object,
-  license?: string,
+  license: string,
   description?: string,
-  dependencyPkgs?: Array<string>,
-  repository?: {type: string, url: string},
-  projectLink?: string
+  devDependencies: Object,
+  projectLink?: string,
+  repository: { type?: string, url?: string }
 }
 
 export type Options = {
+  targetDir: string,
   tmpDir: string,
   package: Package,
   year: number,
   featureList: Array<string>,
-  features?: Object
+  features: Object,
+  projectType: string,
+  licenseEnc?: string,
+  dependencyPkgs: Array<string>
 }
 
 export type Arguments = {
   dir: string,
   help?: boolean,
   'dry-run'?: boolean,
-  defaults?: boolean
+  config?: string
 }
