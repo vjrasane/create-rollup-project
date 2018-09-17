@@ -3,6 +3,11 @@
   "version": "{{package.version}}",
   "description": "{{package.description}}",
   "main": "{{package.main}}",
+  {{#if (eq projectType "Command Line Tool")}}
+  "bin": {
+    "{{package.name}}": "{{package.main}}"
+  },
+  {{/if}}
   {{#if package.scripts}}
   "scripts": {
   {{#each package.scripts}}

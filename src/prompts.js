@@ -16,7 +16,7 @@ const misc: Array<string> = [
   'readme',
   'license',
   'publish',
-  'gitignore'
+  'github'
 ]
 
 export const allFeatures: Array<string> = [
@@ -47,8 +47,19 @@ export default opts => {
   enquirer.question('projectVersion', 'Project version?', {
     default: opts.package.version
   })
+  enquirer.question('projectType', 'Project type?', {
+    type: 'list',
+    default: opts.projectType,
+    choices: [
+      'Library',
+      'Command Line Tool'
+    ]
+  })
   enquirer.question('authorName', 'Author name?', {
     default: opts.package.author
+  })
+  enquirer.question('githubUrl', 'Github URL?', {
+    default: opts.package.repository.url
   })
   enquirer.question('license', 'License?', {
     type: 'list',
@@ -75,7 +86,7 @@ export default opts => {
   enquirer.question('features', 'Features? (Space to (de)select)', {
     type: 'checkbox',
     radio: true,
-    default: [...opts.featureList, 'bundling', 'style', 'testing', 'misc'],
+    default: [...opts.featureList, 'all', 'bundling', 'style', 'testing', 'misc'],
     choices: features
   })
   return enquirer

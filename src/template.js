@@ -10,6 +10,9 @@ registerHelper({
   },
   and: function () {
     return Array.prototype.slice.call(arguments, 0, -1).every(Boolean)
+  },
+  eq: function (first, second) {
+    return first === second
   }
 })
 

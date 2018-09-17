@@ -1,6 +1,6 @@
 /* @flow */
 
-import { basename } from 'path'
+import { basename, join } from 'path'
 import { existsSync, statSync } from 'fs'
 import git from 'parse-git-config'
 import { userInfo } from 'os'
@@ -10,15 +10,30 @@ import { template } from './template'
 import { mkdirpSync, removeSync, copySync } from 'fs-extra'
 import prompts, { confirm, allFeatures } from './prompts'
 import { info, warn, divider } from './logging'
+
 import execFeats from './features'
 import pkgJson from '../package'
 
+import type { SynchronousResult } from 'tmp'
+import type { Config } from 'parse-git-config'
+import type { Options, Arguments } from './types'
+
 const GIT_ORIGIN = 'remote "origin"'
 
-export default async dirPath => {
+export default async (args: Arguments): Promise<void> => {
+  const processDir: string = process.cwd()
+  const dirPath: string = join(processDir, args.dir)
+
   info("Target directory '" + dirPath + "'")
   info('Creating temporary directory')
-  const tmpDir: Object = dirSync() // create tmp dir
+  const tmpDir: SynchronousResult = dirSync() // create tmp dir
+
+  if (existsSync(dirPath)) {
+    if (!statSync(dirPath).isDirectory()) {
+      throw new Error("'" + dirPath + "' is not a directory")
+    }
+    warn("Directory '" + dirPath + "' already exists.")
+  }
 
   const cleanup = () => {
     info('Cleaning temporary directory')
@@ -26,135 +41,138 @@ export default async dirPath => {
   }
 
   try {
-    const defaultOpts: Object = {
+    const pkgName: string = basename(dirPath)
+    const author: string = userInfo().username
+    const description: string = pkgName + ' by ' + author
+
+    const gitUrl = (): string => {
+      const gitConf: Config = git.sync({ cwd: dirPath, path: '.git/config' })
+      let url: string = ''
+      if (GIT_ORIGIN in gitConf) {
+        info('Found git configuration in target directory')
+        url = gitConf[GIT_ORIGIN].url
+        // replace 'git@' with protocol
+        if (url.startsWith('git@')) {
+          url = url.replace(':', '/').replace('git@', 'https://')
+        }
+
+        // make sure starts with 'git+'
+        if (!url.startsWith('git+')) {
+          url = 'git+' + url
+        }
+
+        // make sure ends with '.git'
+        if (!url.endsWith('.git')) {
+          url = url + '.git'
+        }
+      } else {
+        url = ['git+https://github.com', author, pkgName + '.git'].join('/')
+      }
+      return url
+    }
+
+    const defaultOpts: Options = {
       tmpDir: tmpDir.name,
       package: {
-        name: basename(dirPath),
+        name: pkgName,
+        description,
         version: '0.0.1',
-        author: userInfo().username,
+        author,
         main: 'src/main.js',
         scripts: {
           test: "echo 'Error: no test specified' && exit 1"
         },
         license: 'Apache-2.0',
-        dependencyPkgs: []
+        dependencyPkgs: [],
+        repository: {
+          type: 'git',
+          url: gitUrl()
+        }
       },
-      year: (new Date()).getFullYear(),
-      featureList: allFeatures
+      year: new Date().getFullYear(),
+      featureList: allFeatures,
+      projectType: 'Library'
     }
 
-    defaultOpts.package.description =
-      defaultOpts.package.name + ' by ' + defaultOpts.package.author
+    const prompt = async () => {
+      const enquirer = prompts(defaultOpts)
 
-    const gitConf = git.sync({ cwd: dirPath, path: '.git/config' })
-    if (GIT_ORIGIN in gitConf) {
-      info('Found git configuration in target directory')
-      const gitUrl = gitConf[GIT_ORIGIN].url
-      defaultOpts.projectLink = gitUrl
-        /*
-        * Split by ':'. If the url starts with 'http://'
-        * we get the url without protocol, if it starts
-        * with 'git@<url>:', we get the project path
-        */
-        .split(':')[1]
-        .split('/') // split the URI to path parts
-        .splice(-2) // take two last parts
-        .join('/') // combine them back to a string
+      const questions = async () => {
+        const answers: Object = await enquirer.ask([
+          'projectName',
+          'projectVersion',
+          'projectType',
+          'authorName',
+          'features'
+        ])
 
-      // replace 'git@' with protocol
-      let url = gitUrl.startsWith('git@')
-        ? gitUrl.replace('git@', 'https://')
-        : gitUrl
-
-      // make sure starts with 'git+'
-      if (!url.startsWith('git+')) {
-        url = 'git+' + url
-      }
-
-      // make sure ends with '.git'
-      if (!url.endsWith('.git')) {
-        url += '.git'
-      }
-
-      defaultOpts.package.repository = {
-        type: 'git',
-        url
-      }
-    }
-
-    const enquirer = prompts(defaultOpts)
-
-    const questions = async () => {
-      const answers = await enquirer.ask([
-        'projectName',
-        'projectVersion',
-        'authorName',
-        'features'
-      ])
-
-      const answerOpts = {
-        package: {
-          name: answers.projectName,
-          version: answers.projectVersion,
-          author: answers.authorName
+        const answerOpts: Options = {
+          package: {
+            name: answers.projectName,
+            version: answers.projectVersion,
+            author: answers.authorName
+          },
+          projectType: answers.projectType
         }
-      }
 
-      if (defaultOpts.package.repository) {
-        const answer = await confirm(
-          'Set project repository? (' + defaultOpts.package.repository.url + ')'
-        )
-        answer || delete defaultOpts.package.repository
-      }
-
-      if (answers.features.includes('license')) {
-        let { license } = await enquirer.ask('license')
-        if (license === 'Other') {
-          license = await enquirer.ask('otherLicense').otherLicense
+        if (answers.features.includes('github')) {
+          const { githubUrl }: string = await enquirer.ask('githubUrl')
+          answerOpts.package.repository = {
+            type: 'git',
+            url: githubUrl
+          }
+          answerOpts.projectLink = githubUrl
+            .split('/') // split the URI to path parts
+            .splice(-2) // take two last parts
+            .join('/') // combine them back to a string
+        } else {
+          delete defaultOpts.package.repository
         }
-        answerOpts.package.license = license
+
+        if (answers.features.includes('license')) {
+          let { license }: string = await enquirer.ask('license')
+          if (license === 'Other') {
+            license = await enquirer.ask('otherLicense').otherLicense
+          }
+          answerOpts.package.license = license
+        } else {
+          delete defaultOpts.package.license
+        }
+
+        const merged: Options = deepmerge(defaultOpts, answerOpts)
+        merged.featureList = answers.features
+
+        divider()
+        return merged
+      }
+
+      if (existsSync(dirPath)) {
+        divider()
+        const sure: string =
+          'Are you sure you want to configure an existing directory?'
+        const overwrite: boolean = await confirm(sure)
+        if (!overwrite) {
+          cleanup()
+          warn('Cancelled')
+          process.exit(1)
+        }
       } else {
-        delete defaultOpts.package.license
-      }
-
-      const merged = deepmerge(defaultOpts, answerOpts)
-
-      merged.featureList = answers.features
-
-      return merged
-    }
-
-    if (existsSync(dirPath)) {
-      if (!statSync(dirPath).isDirectory()) {
-        throw new Error("'" + dirPath + "' is not a directory")
-      }
-      warn("Directory '" + dirPath + "' already exists.")
-      divider()
-      const sure: string =
-        'Are you sure you want to configure an existing directory?'
-      const overwrite: boolean = await confirm(sure)
-      if (!overwrite) {
-        cleanup()
-        warn('Cancelled')
-        process.exit(1)
-      }
-    } else {
-      divider()
-    }
-
-    const { howConfig } = await enquirer.ask(['howConfig'])
-    let userOpts = defaultOpts
-    switch (howConfig) {
-      case 'Answer questions':
-        userOpts = await questions() // get user input
         divider()
-        break
-      default:
-        divider()
-        info('Using default settings')
-        // do nothing and use defaults
-        break
+      }
+
+      const { howConfig } = await enquirer.ask(['howConfig'])
+
+      switch (howConfig) {
+        case 'Answer questions':
+          return questions() // get user input
+        default:
+          divider()
+          info('Using default settings')
+          return defaultOpts // do nothing and use defaults
+      }
     }
+
+    const userOpts = args.defaults ? defaultOpts : await prompt()
 
     // set feature flags
     userOpts.features = {}
@@ -163,8 +181,10 @@ export default async dirPath => {
     })
     // remove raw string feature list
     delete userOpts.featureList
+
+    info('Configuring features: ')
     // execute each feature
-    const opts = execFeats(userOpts)
+    const opts: Options = execFeats(userOpts)
 
     // set dev dependency versions based on current package.json
     opts.package.devDependencies = {}
@@ -178,14 +198,18 @@ export default async dirPath => {
     // write package.json
     template('package.json.template', opts)
 
-    // make sure target dir exists
-    if (!existsSync(dirPath)) {
-      info("Creating project directory '" + dirPath + "'")
-      mkdirpSync(dirPath)
-    }
+    if (!args['dry-run']) {
+      // make sure target dir exists
+      if (!existsSync(dirPath)) {
+        info("Creating project directory '" + dirPath + "'")
+        mkdirpSync(dirPath)
+      }
 
-    info('Copying project files')
-    copySync(tmpDir.name, dirPath) // copy tmp dir contents
+      info('Copying project files')
+      copySync(tmpDir.name, dirPath) // copy tmp dir contents
+    } else {
+      info('Dry run enabled: skipping copying project files')
+    }
   } finally {
     cleanup()
   }

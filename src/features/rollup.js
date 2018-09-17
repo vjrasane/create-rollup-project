@@ -12,12 +12,13 @@ export default (opts: Object): Object => {
     'rollup-plugin-progress',
     'rollup-plugin-json',
     'rollup-plugin-uglify',
+    'rollup-plugin-node-builtins',
     'cross-env'
   ]
 
   opts.features.babel && dependencyPkgs.push('rollup-plugin-babel')
 
-  const scripts: Object<string> = {
+  const scripts: { build: string, watch: string } = {
     build: 'cross-env NODE_ENV=production rollup -c',
     watch: 'cross-env NODE_ENV=development rollcup -c -w'
   }

@@ -6,11 +6,11 @@ by {{package.author}}
 <!-- 
 [![License][License badge]][License] 
 -->
-{{/if}}{{/if}}{{#if features.travis}}{{#if projectLink}}[![Build Status][travis badge]][travis] {{else}}
+{{/if}}{{/if}}{{#if features.travis}}{{#if (and package.repository projectLink)}}[![Build Status][travis badge]][travis] {{else}}
 <!-- 
 [![Build Status][travis badge]][travis] 
 -->
-{{/if}}{{/if}}{{#if features.coveralls}}{{#if projectLink}}[![Coverage Status][coverage badge]][coveralls] {{else}}
+{{/if}}{{/if}}{{#if features.coveralls}}{{#if (and package.repository projectLink)}}[![Coverage Status][coverage badge]][coveralls] {{else}}
 <!-- 
 [![Coverage Status][coverage badge]][coveralls] 
 -->
@@ -41,7 +41,7 @@ yarn add {{package.name}}
 ## API
 
 {{#if features.coveralls}}
-{{#if projectLink}}
+{{#if (and package.repository projectLink)}}
 [Coverage badge]: https://coveralls.io/repos/github/{{projectLink}}/badge.svg?service=github
 [Coveralls]: https://coveralls.io/github/{{projectLink}}
 {{else}}
@@ -63,7 +63,7 @@ yarn add {{package.name}}
 {{/if}}
 {{/if}}
 {{#if features.travis}}
-{{#if projectLink}}
+{{#if (and package.repository projectLink)}}
 [Travis]: https://travis-ci.org/{{projectLink}}
 [Travis badge]: https://travis-ci.org/{{projectLink}}.svg?branch=master&service=github
 {{else}}

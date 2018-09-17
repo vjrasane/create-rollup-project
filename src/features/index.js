@@ -1,6 +1,7 @@
 /* @flow */
 
 import deepmerge from 'deepmerge'
+import { grey } from 'chalk'
 import rollup from './rollup'
 import babel from './babel'
 import jest from './jest'
@@ -8,6 +9,7 @@ import eslint from './eslint'
 import dummies from './dummies'
 import license from './license'
 import { template, staticFile } from '../template'
+import { stdout } from '../logging'
 
 const dependencies = (dependencyPkgs: Array<string>): Function<Object> => (
   opts: Object
@@ -69,10 +71,15 @@ const features = {
     scripts({ coveralls: 'cat ./coverage/lcov.info | coveralls' })
   ]),
   standard: dependencies(['standard']),
-  gitignore: templates(['.gitignore.template'])
+  github: templates(['.gitignore.template'])
 }
 
 export default opts =>
-  Object.keys(features)
-    .filter(f => f in opts.features)
-    .reduce((acc, curr) => features[curr](acc), opts)
+  Object.keys(features).reduce((acc, curr) => {
+    if (curr in opts.features) {
+      stdout(' * ' + curr)
+      return features[curr](acc)
+    }
+    stdout(grey(' * ' + curr + ' (skipped)'))
+    return acc
+  }, opts)
