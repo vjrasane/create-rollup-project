@@ -20,7 +20,7 @@ export default (opts: Object): Object => {
 
   const scripts: { build: string, watch: string } = {
     build: 'cross-env NODE_ENV=production rollup -c',
-    watch: 'cross-env NODE_ENV=development rollcup -c -w'
+    watch: 'cross-env NODE_ENV=development rollcp -c -w'
   }
 
   template('rollup.config.js.template', opts)

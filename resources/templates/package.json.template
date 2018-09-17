@@ -60,6 +60,6 @@
   },
   {{/if}}
   "keywords": [
-    "library"
+    {{#if (eq projectType "Library")}}"library"{{else}}"command line"{{/if}}
   ]
 }

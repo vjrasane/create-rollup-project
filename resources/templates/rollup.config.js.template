@@ -10,6 +10,10 @@ import fs from 'fs'
 
 const production = process.env.NODE_ENV === 'production'
 
+/*
+* Dynamically reads dependencies from package.json
+* and adds them to the list of external dependencies
+*/
 const pkg = JSON.parse(fs.readFileSync('./package.json'))
 const ext = Object.keys(pkg.dependencies || {})
 
@@ -28,17 +32,17 @@ export default {
   },
   plugins: [
     progress(),
-    /*
-    * Resolve dependencies to be bundled with your code. This should
-    * only be babel-runtime and everything else should be left as
-    * an external dependency.
-    */
     json(), // transforms imported JSON files to JavaScript
     builtins(),
     commonjs({
       include: 'node_modules/**',
       exclude: ['src/**', 'test/**']
     }),
+    /*
+    * Resolve dependencies to be bundled with your code. This should
+    * only be babel-runtime and everything else should be left as
+    * an external dependency.
+    */
     resolve(),
     {{#if features.babel}}
     babel({
@@ -47,7 +51,7 @@ export default {
       * in turn are required by Jest, which will read its configuration from .babelrc
       */
       babelrc: false,
-      presets: [['env', { modules: false }], 'flow'],
+      presets: [['env', { modules: false }]{{#if features.flow}}, 'flow'{{/if}}],
       exclude: ['node_modules/**', '*.json'], // only transpile our source code
       runtimeHelpers: true, // otherwise transform-runtime throws an error
       plugins: [

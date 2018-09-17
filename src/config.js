@@ -118,9 +118,11 @@ export default async (args: Arguments): Promise<void> => {
               url: gitUrl(answers.projectName, answers.authorName)
             }
           },
-          featureList: answers.features,
           projectType: answers.projectType
         })
+
+        // must overwrite entire array, otherwise its merged
+        answerOpts.featureList = answers.features
 
         const detailsEnq = prompts(answerOpts)
 
@@ -184,6 +186,8 @@ export default async (args: Arguments): Promise<void> => {
     // remove raw string feature list
     delete userOpts.featureList
 
+    console.log(userOpts.features)
+
     info('Configuring features: ')
     // execute each feature
     const opts: Options = execFeats(userOpts)
@@ -195,7 +199,6 @@ export default async (args: Arguments): Promise<void> => {
     )
     // remove fields that arent needed
     delete opts.package.dependencyPkgs
-    delete opts.features
 
     // write package.json
     template('package.json.template', opts)

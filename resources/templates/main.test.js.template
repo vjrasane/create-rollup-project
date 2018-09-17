@@ -1,7 +1,7 @@
 {{#if features.babel}}
 import message from '../src/main'
 {{else}}
-const message = require('../src/main')
+var message = require('../src/main')
 {{/if}}
 
 it('Test', {{#if features.babel}}() =>{{else}}function (){{/if}} {

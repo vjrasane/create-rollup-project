@@ -1,4 +1,4 @@
-const message = 'Hello {{package.name}}!'
+{{#if features.babel}}const{{else}}var{{/if}} message = 'Hello {{package.name}}!'
 
 console.log(message)
 
