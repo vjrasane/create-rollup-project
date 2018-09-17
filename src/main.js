@@ -10,18 +10,17 @@ import usage from './usage'
 
 import type { Arguments } from './types'
 
-const readLogo = line => {
-  const path = join(
+const readLogo = (line: string): string => {
+  const path: string = join(
     dirname(dirname(module.filename)),
     'resources/logo',
     line + '.txt'
   )
-  const contents = readFileSync(path, 'utf-8')
+  const contents: string = readFileSync(path, 'utf-8')
   return contents
 }
 
-const showHelp = () => stdout(usage)
-;(async () => {
+;(async (): Promise<void> => {
   try {
     stdout(yellow(readLogo('create')))
     stdout(red(readLogo('rollup')))
@@ -49,7 +48,7 @@ const showHelp = () => stdout(usage)
     ])
 
     if (args.help) {
-      showHelp()
+      stdout(usage)
       process.exit()
     }
 
@@ -57,7 +56,7 @@ const showHelp = () => stdout(usage)
     await config(args)
     success('Configuration finished succesfully!')
   } catch (err) {
-    showHelp()
+    stdout(usage)
     error(err.message)
     process.exit(1)
   }
