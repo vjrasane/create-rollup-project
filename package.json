@@ -1,7 +1,7 @@
 {
-  "name": "rollup-template",
+  "name": "create-rollup-project",
   "version": "0.0.1",
-  "description": "Basic configuration for Rollup and other useful things",
+  "description": "Creates a skeleton project with Rollup configuration as well as some other useful goodies",
   "main": "dist/main.js",
   "bin": {
     "create-rollup-project": "dist/main.js"
@@ -9,28 +9,34 @@
   "scripts": {
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "build": "cross-env NODE_ENV=production rollup -c",
-    "watch": "rollup -c -w",
+    "watch": "cross-env NODE_ENV=development rollup -c -w",
     "lint": "node_modules/.bin/eslint .",
     "test": "standard && cross-env NODE_ENV=development jest --coverage"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vjrasane/rollup-template.git"
+    "url": "git+https://github.com/vjrasane/create-rollup-project.git"
   },
   "keywords": [
     "template",
     "rollup",
     "travis",
     "eslint",
+    "husky",
+    "standard",
+    "bundling",
+    "testing",
+    "coveralls",
+    "style",
     "jest",
     "babel"
   ],
   "author": "Ville Räsänen",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/vjrasane/rollup-template/issues"
+    "url": "https://github.com/vjrasane/create-rollup-project/issues"
   },
-  "homepage": "https://github.com/vjrasane/rollup-template#readme",
+  "homepage": "https://github.com/vjrasane/create-rollup-project#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-eslint": "^9.0.0",
