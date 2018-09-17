@@ -1,6 +1,6 @@
 /* @flow */
 
-import { basename, join } from 'path'
+import { basename, join, isAbsolute } from 'path'
 import { existsSync, statSync } from 'fs'
 import git from 'parse-git-config'
 import { userInfo } from 'os'
@@ -22,7 +22,7 @@ const GIT_ORIGIN = 'remote "origin"'
 
 export default async (args: Arguments): Promise<void> => {
   const processDir: string = process.cwd()
-  const dirPath: string = join(processDir, args.dir)
+  const dirPath: string = isAbsolute(args.dir) ? args.dir : join(processDir, args.dir)
 
   info("Target directory '" + dirPath + "'")
   info('Creating temporary directory')
@@ -208,7 +208,7 @@ export default async (args: Arguments): Promise<void> => {
       info('Copying project files')
       copySync(tmpDir.name, dirPath) // copy tmp dir contents
     } else {
-      info('Dry run enabled: skipping copying project files')
+      info('Dry run enabled: skipped copying project files')
     }
   } finally {
     cleanup()
