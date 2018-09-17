@@ -1,8 +1,11 @@
 module.exports = {
-  parser: "babel-eslint",
-  extends: 'standard',
+  parser: 'babel-eslint',
+  extends: ['standard'],
   env: {
-    jest : true,
+    jest: true,
     node: true
+  },
+  rules: {
+    'no-console': 'warn'
   }
-};
+}

@@ -6,5 +6,8 @@ module.exports = {
   env: {
     {{#if features.jest}}jest : true,{{/if}}
     node: true
+  },
+  rules: {
+    'no-console': 'warn'
   }
-};
+}
