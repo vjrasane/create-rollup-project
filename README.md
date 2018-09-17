@@ -1,6 +1,6 @@
 # create-rollup-project
 
-[![License][asl-2.0 badge]][asl-2.0] [![Build Status][travis badge]][travis] [![Coverage Status][coverage badge]][coveralls] [![npm version][npm badge]][npm]
+[![License][License badge]][License] [![Build Status][travis badge]][travis] [![Coverage Status][coverage badge]][coveralls] [![npm version][npm badge]][npm]
 
 [Coverage badge]: https://coveralls.io/repos/github/vjrasane/create-rollup-project/badge.svg?service=github
 [Coveralls]: https://coveralls.io/github/vjrasane/create-rollup-project

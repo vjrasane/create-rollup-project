@@ -3,7 +3,7 @@
 import cliArgs from 'command-line-args'
 import { readFileSync } from 'fs'
 import { yellow, red } from 'chalk'
-import { stdout, error } from './logging'
+import { stdout, error, success } from './logging'
 import { join, dirname } from 'path'
 import config from './config'
 import usage from './usage'
@@ -55,6 +55,7 @@ const showHelp = () => stdout(usage)
 
     if (!args.dir) throw new Error('Target directory not specified')
     await config(args)
+    success('Configuration finished succesfully!')
   } catch (err) {
     showHelp()
     error(err.message)
