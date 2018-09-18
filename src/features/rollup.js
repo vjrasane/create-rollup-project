@@ -4,7 +4,7 @@ import deepmerge from 'deepmerge'
 import { template } from '../template'
 
 export default (opts: Object): Object => {
-  const dependencyPkgs: Array<string> = [
+  const devDependencies: Array<string> = [
     'rollup',
     'rollup-plugin-commonjs',
     'rollup-plugin-filesize',
@@ -16,7 +16,7 @@ export default (opts: Object): Object => {
     'cross-env'
   ]
 
-  opts.features.babel && dependencyPkgs.push('rollup-plugin-babel')
+  opts.features.babel && devDependencies.push('rollup-plugin-babel')
 
   const scripts: { build: string, watch: string } = {
     build: 'cross-env NODE_ENV=production rollup -c',
@@ -26,7 +26,7 @@ export default (opts: Object): Object => {
   template('rollup.config.js.template', opts)
 
   return deepmerge(opts, {
-    dependencyPkgs,
+    devDependencies,
     package: {
       main: 'dist/main.js', // change main to the bundle
       scripts

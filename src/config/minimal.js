@@ -1,11 +1,8 @@
 /* @flow */
 
-import type { Options } from '../types'
+import type { Config } from '../types'
 
-export default (defaultOpts: Options): Options => {
-  const opts = { ...defaultOpts }
-  delete opts.package.license
-  delete opts.package.repository
-  opts.featureList = ['rollup', 'babel', 'jest', 'dummies']
-  return opts
-}
+export default (defaults: Config, init: Config): Config => ({
+  ...init,
+  features: ['rollup', 'babel', 'jest', 'dummies']
+})

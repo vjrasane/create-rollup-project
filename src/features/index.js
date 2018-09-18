@@ -11,41 +11,45 @@ import license from './license'
 import { template, staticFile } from '../template'
 import { stdout } from '../logging'
 
-import type { Options } from '../types'
+import type { Config } from '../types'
 
-const dependencies = (
-  dependencyPkgs: Array<string>
-): ((opts: Options) => Options) => (opts: Options): Options => {
-  return deepmerge(opts, { dependencyPkgs })
+const devDependencies = (
+  devDependencies: Array<string>
+): ((conf: Config) => Config) => (conf: Config): Config => {
+  return deepmerge(conf, {
+    package: {
+      devDependencies
+    }
+  })
 }
 
-const scripts = (scripts: Object): ((opts: Options) => Options) => (
-  opts: Options
-): Options =>
-  deepmerge(opts, {
+const scripts = (scripts: Object): ((conf: Config) => Config) => (
+  conf: Config
+): Config =>
+  deepmerge(conf, {
     package: {
       scripts
     }
   })
 
-const templates = (temps: Array<string>): ((opts: Options) => Options) => (
-  opts: Options
-): Options => {
-  temps.forEach(t => template(t, opts))
-  return opts
+const templates = (temps: Array<string>): ((conf: Config) => Config) => (
+  conf: Config
+): Config => {
+  temps.forEach(t => template(t, conf))
+  return conf
 }
 
-const statics = (statics: Array<string>): ((opts: Options) => Options) => (
-  opts: Options
-): Options => {
-  statics.forEach(s => staticFile(s, opts))
-  return opts
+const statics = (statics: Array<string>): ((conf: Config) => Config) => (
+  conf: Config
+): Config => {
+  statics.forEach(s => staticFile(s, conf))
+  return conf
 }
 
 const chain = (
-  funcs: Array<(opts: Options) => Options>
-): ((opts: Options) => Options) => (opts: Options): Options => {
-  const res = funcs.reduce((acc, curr) => curr(acc), opts)
+  funcs: Array<(conf: Config) => Config>
+): ((conf: Config) => Config) => (conf: Config): Config => {
+  const res = funcs.reduce((acc, curr) => curr(acc), conf)
   return res
 }
 
@@ -57,27 +61,27 @@ const features: Object = {
   dummies,
   license,
   flow: chain([
-    dependencies(['flow-bin', 'flow-typed']),
+    devDependencies(['flow-bin', 'flow-typed']),
     statics(['.flowconfig'])
   ]),
-  husky: chain([dependencies(['husky']), statics(['husky.config.js'])]),
+  husky: chain([devDependencies(['husky']), statics(['husky.config.js'])]),
   travis: templates(['.travis.yml.template']),
   publish: statics(['.yarnignore']),
   readme: templates(['README.md.template']),
   coveralls: chain([
-    dependencies(['coveralls']),
+    devDependencies(['coveralls']),
     scripts({ coveralls: 'cat ./coverage/lcov.info | coveralls' })
   ]),
-  standard: dependencies(['standard']),
+  standard: devDependencies(['standard']),
   github: templates(['.gitignore.template'])
 }
 
-export default (opts: Options): Options =>
+export default (conf: Config): Config =>
   Object.keys(features).reduce((acc, curr) => {
-    if (curr in opts.features) {
+    if (curr in conf.features) {
       stdout(' * ' + curr)
       return features[curr](acc)
     }
     stdout(grey(' * ' + curr + ' (skipped)'))
     return acc
-  }, opts)
+  }, conf)

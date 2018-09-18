@@ -5,7 +5,7 @@ import checkbox from 'prompt-checkbox'
 
 import { getGitUrl } from './defaults'
 
-import type { Options } from './types'
+import type { Config } from './types'
 
 const bundling: Array<string> = ['rollup', 'babel']
 const style: Array<string> = ['eslint', 'standard', 'flow']
@@ -25,7 +25,7 @@ export const allFeatures: Array<string> = [
   ...misc
 ]
 
-export const prompts = (opts: Options): Enquirer => {
+export const prompts = (conf: Config): Enquirer => {
   const enquirer: Enquirer = new Enquirer()
   // register additional prompt types
   enquirer.register('list', list)
@@ -41,18 +41,18 @@ export const prompts = (opts: Options): Enquirer => {
     }
   )
   enquirer.question('projectName', 'Project name?', {
-    default: opts.package.name
+    default: conf.package.name
   })
   enquirer.question('projectVersion', 'Project version?', {
-    default: opts.package.version
+    default: conf.package.version
   })
   enquirer.question('projectType', 'Project type?', {
     type: 'list',
-    default: opts.projectType,
+    default: conf.projectType,
     choices: ['Library', 'Command Line Tool']
   })
   enquirer.question('authorName', 'Author name?', {
-    default: opts.package.author
+    default: conf.package.author
   })
 
   const features: Object = {
@@ -65,42 +65,30 @@ export const prompts = (opts: Options): Enquirer => {
   enquirer.question('features', 'Features? (Space to (de)select)', {
     type: 'checkbox',
     radio: true,
-    default: [
-      ...opts.featureList,
-      'all',
-      'bundling',
-      'style',
-      'testing',
-      'misc'
-    ],
+    default: [...conf.features, 'all', 'bundling', 'style', 'testing', 'misc'],
     choices: features
   })
 
   enquirer.question('githubUrl', 'Github URL?', {
-    default: opts.package.repository.url
+    default: conf.package.repository ? conf.package.repository.url : null
   })
   enquirer.question('license', 'License?', {
     type: 'list',
-    default: opts.package.license,
+    default: conf.package.license,
     choices: [
       'Apache-2.0',
       'MIT',
       'ISC',
       'BSD-3-Clause',
       'GPL-3.0',
-      'LGPL-3.0',
-      'Other'
+      'LGPL-3.0'
     ]
   })
-  enquirer.question('otherLicense', 'Other license?')
-
   return enquirer
 }
 
-const getUserOpts = async (defaultOpts: Options): Options => {
-  let enquirer = prompts(defaultOpts)
-
-  const answers: Object = await enquirer.ask([
+export default async (defaults: Config, init: Config): Config => {
+  const answers: Object = await prompts(defaults).ask([
     'projectName',
     'projectVersion',
     'projectType',
@@ -108,54 +96,52 @@ const getUserOpts = async (defaultOpts: Options): Options => {
     'features'
   ])
 
-  const answerOpts: Options = deepmerge(defaultOpts, {
+  const answerConf: Config = deepmerge(init, {
     package: {
       name: answers.projectName,
       version: answers.projectVersion,
       author: answers.authorName,
-      description: answers.projectName + ' by ' + answers.authorName
+      description: answers.projectName + ' by ' + answers.authorName,
+      type: answers.projectType
     },
-    projectType: answers.projectType
+    features: answers.features
   })
 
-  // set git repository according to previous answers
-  answerOpts.package.repository = {
-    type: 'git',
-    url: getGitUrl(answerOpts)
-  }
+  // create enquirer with new default values
+  const enquirer = prompts(
+    deepmerge(
+      defaults,
+      deepmerge(answerConf, {
+        package: {
+          repository: {
+            type: 'git',
+            url: getGitUrl(answerConf)
+          }
+        }
+      })
+    )
+  )
 
-  // must overwrite entire array, otherwise its merged
-  answerOpts.featureList = answers.features
-
-  // update enquirer so that default values are set correctly
-  enquirer = prompts(answerOpts)
-
-  // ask github url if feature is enabled
-  if (answers.features.includes('github')) {
-    const { githubUrl }: string = await enquirer.ask('githubUrl')
-    answerOpts.package.repository.url = githubUrl
-    answerOpts.projectLink = githubUrl
-      .split('/') // split the URI to path parts
-      .splice(-2) // take two last parts
-      .join('/') // combine them back to a string
-  } else {
-    // remove default repository if feature is disabled
-    delete answerOpts.package.repository
-  }
-
-  // ask license if feature is enabled
-  if (answers.features.includes('license')) {
-    let { license }: string = await enquirer.ask('license')
-    if (license === 'Other') {
-      license = await enquirer.ask('otherLicense').otherLicense
+  const extraQuestions = {
+    github: async opts => {
+      const { githubUrl }: string = await enquirer.ask('githubUrl')
+      opts.package.repository = {
+        type: 'git',
+        url: githubUrl
+      }
+    },
+    license: async opts => {
+      let { license }: string = await enquirer.ask('license')
+      opts.package.license = license
     }
-    answerOpts.package.license = license
-  } else {
-    // remove default repository if feature is disabled
-    delete answerOpts.package.license
   }
 
-  return answerOpts
-}
+  const questions = Object.keys(extraQuestions).filter(f =>
+    answers.features.includes(f)
+  )
+  for (const q of questions) {
+    await extraQuestions[q](answerConf)
+  }
 
-export default (defaultOpts: Options): Options => getUserOpts(defaultOpts)
+  return answerConf
+}

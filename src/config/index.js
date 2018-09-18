@@ -1,5 +1,6 @@
 /* @flow */
 
+import deepmerge from 'deepmerge'
 import { basename, join, isAbsolute } from 'path'
 import { existsSync, statSync } from 'fs'
 
@@ -19,7 +20,7 @@ import minimal from './minimal'
 import prompts, { allFeatures } from './prompts'
 
 import type { SynchronousResult } from 'tmp'
-import type { Options, Arguments } from '../types'
+import type { Arguments, Config } from '../types'
 
 const choiceMapping = {
   'Use defaults': 'defaults',
@@ -42,6 +43,41 @@ const confirmOverwrite = (): Promise<boolean> =>
     default: false
   }).run()
 
+const preFeatureProcess = (conf: Config): Config => {
+  const processed = { ...conf }
+
+  const features = {}
+  conf.features.forEach(f => {
+    features[f] = true
+  })
+  processed.features = features
+
+  if (conf.package.repository) {
+    processed.projectLink = conf.package.repository.url
+      .split('/') // split the URI to path parts
+      .splice(-2) // take two last parts
+      .join('/') // combine them back to a string
+  }
+
+  return processed
+}
+
+const postFeatureProcess = (conf: Config): Config => {
+  const processed = { ...conf }
+
+  const devDeps = {}
+  conf.package.devDependencies.forEach(
+    d => (devDeps[d] = pkgJson.devDependencies[d])
+  )
+  processed.package.devDependencies = devDeps
+
+  const deps = {}
+  conf.package.dependencies.forEach(d => (deps[d] = pkgJson.dependencies[d]))
+  processed.package.dependencies = deps
+
+  return processed
+}
+
 export default async (args: Arguments): Promise<void> => {
   const processDir: string = process.cwd()
   const dirPath: string = isAbsolute(args.dir)
@@ -62,7 +98,7 @@ export default async (args: Arguments): Promise<void> => {
     const author: string = userInfo().username
     const description: string = pkgName + ' by ' + author
 
-    const defaultOpts: Options = {
+    const initConf: Config = {
       targetDir: dirPath,
       tmpDir: tmpDir.name,
       package: {
@@ -74,19 +110,22 @@ export default async (args: Arguments): Promise<void> => {
         scripts: {
           test: "echo 'Error: no test specified' && exit 1"
         },
-        license: 'Apache-2.0',
-        repository: {},
-        devDependencies: {}
+        devDependencies: [],
+        dependencies: []
       },
-      dependencyPkgs: [],
       year: new Date().getFullYear(),
-      featureList: allFeatures,
-      features: {},
-      projectType: 'Library'
+      projectType: 'Library',
+      features: []
     }
 
-    isGitRepo(defaultOpts) &&
-      info('Found git configuration in target directory')
+    const defaultConf: Config = deepmerge(initConf, {
+      package: {
+        license: 'Apache-2.0'
+      },
+      features: allFeatures
+    })
+
+    isGitRepo(initConf) && info('Found git configuration in target directory')
 
     // check if target dir exists and if so, it really is a directory
     if (existsSync(dirPath)) {
@@ -96,20 +135,20 @@ export default async (args: Arguments): Promise<void> => {
       warn("Directory '" + dirPath + "' already exists.")
     }
 
-    const config = async (type: string): Promise<Options> => {
+    const config = async (type: string): Promise<Config> => {
       switch (type) {
         case 'minimal':
-          return minimal(defaultOpts)
+          return minimal(defaultConf, initConf)
         case 'prompt':
-          return prompts(defaultOpts)
+          return prompts(defaultConf, initConf)
         case 'defaults':
-          return defaults(defaultOpts)
+          return defaults(defaultConf, initConf)
         default:
           throw Error("Invalid config type '" + type + "'")
       }
     }
 
-    const prompt = async (): Promise<Options> => {
+    const prompt = async (): Promise<Config> => {
       divider()
       if (existsSync(dirPath)) {
         if (!(await confirmOverwrite())) {
@@ -119,39 +158,27 @@ export default async (args: Arguments): Promise<void> => {
           process.exit(1)
         }
       }
-      const opts: Options = await config(await configChoices())
+      const opts: Config = await config(await configChoices())
       divider()
       return opts
     }
 
-    let userOpts: Options
+    let conf: Config
     // check if a configuration method is set in args
     if (args.config) {
       info("Configration method: '" + args.config + "'")
-      userOpts = await config(args.config || '')
+      conf = await config(args.config || '')
     } else {
-      userOpts = await prompt()
+      conf = await prompt()
     }
-    // set feature flags
-    userOpts.featureList.forEach(f => {
-      userOpts.features[f] = true
-    })
-    // remove raw string feature list
-    delete userOpts.featureList
 
     info('Configuring features: ')
     // execute each feature
-    const opts: Options = execFeats(userOpts)
-
-    // set dev dependency versions based on current package.json
-    opts.dependencyPkgs.forEach(
-      d => (opts.package.devDependencies[d] = pkgJson.devDependencies[d])
-    )
-    // remove fields that arent needed
-    delete opts.dependencyPkgs
-
+    conf = preFeatureProcess(conf)
+    conf = execFeats(conf)
+    conf = postFeatureProcess(conf)
     // write package.json
-    template('package.json.template', opts)
+    template('package.json.template', conf)
 
     const copyFiles = (): void => {
       // make sure target dir exists

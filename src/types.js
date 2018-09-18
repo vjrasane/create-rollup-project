@@ -6,23 +6,21 @@ export type Package = {
   author: string,
   main?: string,
   scripts?: Object,
-  license: string,
-  description?: string,
-  devDependencies: Object,
-  projectLink?: string,
-  repository: { type?: string, url?: string }
+  license?: string,
+  repository?: { type: string, url: string },
+  devDependencies: Array<string> | Object,
+  dependencies: Array<string> | Object
 }
 
-export type Options = {
+export type Config = {
   targetDir: string,
   tmpDir: string,
   package: Package,
   year: number,
-  featureList: Array<string>,
-  features: Object,
+  features: Array<string> | Object,
   projectType: string,
-  licenseEnc?: string,
-  dependencyPkgs: Array<string>
+  projectLink?: string,
+  licenseEnc?: string
 }
 
 export type Arguments = {

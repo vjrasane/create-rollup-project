@@ -3,7 +3,7 @@
 import deepmerge from 'deepmerge'
 import { sync } from 'parse-git-config'
 
-import type { Options } from '../types'
+import type { Config as Conf } from '../types'
 import type { Config } from 'parse-git-config'
 
 const GIT_ORIGIN = 'remote "origin"'
@@ -11,19 +11,19 @@ const GIT_ORIGIN = 'remote "origin"'
 const readGitConf = (dirPath: string): Config =>
   sync({ cwd: dirPath, path: '.git/config' })
 
-export const isGitRepo = (opts: Options): boolean =>
-  GIT_ORIGIN in readGitConf(opts.targetDir)
+export const isGitRepo = (conf: Conf): boolean =>
+  GIT_ORIGIN in readGitConf(conf.targetDir)
 
-export const getGitUrl = (opts: Options): string => {
-  if (!isGitRepo(opts)) {
+export const getGitUrl = (conf: Conf): string => {
+  if (!isGitRepo(conf)) {
     return [
       'git+https://github.com',
-      opts.package.author,
-      opts.package.name + '.git'
+      conf.package.author,
+      conf.package.name + '.git'
     ].join('/')
   }
 
-  const gitConf: Config = readGitConf(opts.targetDir)
+  const gitConf: Config = readGitConf(conf.targetDir)
   let url: string = gitConf[GIT_ORIGIN].url
 
   // replace 'git@' with protocol
@@ -43,11 +43,12 @@ export const getGitUrl = (opts: Options): string => {
   return url
 }
 
-export default (defaultOpts: Options): Options => deepmerge(defaultOpts, {
-  package: {
-    repository: {
-      type: 'git',
-      url: getGitUrl(defaultOpts)
+export default (defaults: Conf, init: Conf): Conf =>
+  deepmerge(defaults, {
+    package: {
+      repository: {
+        type: 'git',
+        url: getGitUrl(init)
+      }
     }
-  }
-})
+  })

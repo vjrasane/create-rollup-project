@@ -6,7 +6,7 @@ import { template } from '../template'
 import type { Options } from '../types'
 
 export default (opts: Options): Options => {
-  const dependencyPkgs: Array<string> = [
+  const devDependencies: Array<string> = [
     'eslint',
     'eslint-config-standard',
     'eslint-plugin-import',
@@ -14,8 +14,8 @@ export default (opts: Options): Options => {
     'eslint-plugin-promise'
   ]
 
-  opts.features.standard && dependencyPkgs.push('eslint-plugin-standard')
-  opts.features.flow && dependencyPkgs.push('eslint-plugin-flowtype')
+  opts.features.standard && devDependencies.push('eslint-plugin-standard')
+  opts.features.flow && devDependencies.push('eslint-plugin-flowtype')
 
   const scripts: { lint: string } = {
     lint: 'node_modules/.bin/eslint .'
@@ -25,7 +25,7 @@ export default (opts: Options): Options => {
   template('.eslintignore.template', opts)
 
   return deepmerge(opts, {
-    dependencyPkgs,
+    devDependencies,
     package: {
       scripts
     }
