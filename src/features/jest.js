@@ -19,9 +19,9 @@ export default (opts: Options): Options => {
   opts.features.babel && template('.babelrc.template', opts)
 
   return deepmerge(opts, {
-    devDependencies,
     package: {
-      scripts
+      scripts,
+      devDependencies
     }
   })
 }

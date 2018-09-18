@@ -26,10 +26,10 @@ export default (opts: Object): Object => {
   template('rollup.config.js.template', opts)
 
   return deepmerge(opts, {
-    devDependencies,
     package: {
       main: 'dist/main.js', // change main to the bundle
-      scripts
+      scripts,
+      devDependencies
     }
   })
 }

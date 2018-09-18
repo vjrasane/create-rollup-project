@@ -25,9 +25,9 @@ export default (opts: Options): Options => {
   template('.eslintignore.template', opts)
 
   return deepmerge(opts, {
-    devDependencies,
     package: {
-      scripts
+      scripts,
+      devDependencies
     }
   })
 }

@@ -17,52 +17,60 @@ const production = process.env.NODE_ENV === 'production'
 const pkg = JSON.parse(fs.readFileSync('./package.json'))
 const ext = Object.keys(pkg.dependencies || {})
 
-export default {
-  // tell rollup which libraries it can expect to be present externally
-  external: [...ext, 'path', 'fs', 'os'],
-  // input file for building the bundle
-  input: 'src/main.js',
-  // output bundle file
-  output: {
-    file: 'dist/main.js',
-    {{#if (eq projectType "Command Line Tool")}}
-    banner: '#! /usr/bin/env node',
-    {{/if}}
-    format: 'cjs'
-  },
-  plugins: [
-    progress(),
-    json(), // transforms imported JSON files to JavaScript
-    builtins(),
-    commonjs({
-      include: 'node_modules/**',
-      exclude: ['src/**', 'test/**']
-    }),
+// tell rollup which libraries it can expect to be present externally
+const external = [...ext, 'path', 'fs', 'os', 'assert', 'glob']
+const plugins = [
+  progress(),
+  json(), // transforms imported JSON files to JavaScript
+  builtins(),
+  commonjs({
+    include: 'node_modules/**',
+    exclude: ['src/**', 'test/**']
+  }),
+  /*
+  * Resolve dependencies to be bundled with your code. This should
+  * only be babel-runtime and everything else should be left as
+  * an external dependency.
+  */
+  resolve(),
+  {{#if features.babel}}
+  babel({
     /*
-    * Resolve dependencies to be bundled with your code. This should
-    * only be babel-runtime and everything else should be left as
-    * an external dependency.
+    * Babel has to be configured separately for rollup, because we cannot use module transformers with it, which
+    * in turn are required by Jest, which will read its configuration from .babelrc
     */
-    resolve(),
-    {{#if features.babel}}
-    babel({
-      /*
-      * Babel has to be configured separately for rollup, because we cannot use module transformers with it, which
-      * in turn are required by Jest, which will read its configuration from .babelrc
-      */
-      babelrc: false,
-      presets: [['env', { modules: false }]{{#if features.flow}}, 'flow'{{/if}}],
-      exclude: ['node_modules/**', '*.json'], // only transpile our source code
-      runtimeHelpers: true, // otherwise transform-runtime throws an error
-      plugins: [
-        'external-helpers',
-        'transform-runtime', // async-await requires this
-        'transform-class-properties',
-        'transform-object-rest-spread'
-      ]
-    }),
-    {{/if}}
-    production && uglify(), // uglify only in production
-    filesize()
-  ]
-}
+    babelrc: false,
+    presets: [['env', { modules: false }]{{#if features.flow}}, 'flow'{{/if}}],
+    exclude: ['node_modules/**', '*.json'], // only transpile our source code
+    runtimeHelpers: true, // otherwise transform-runtime throws an error
+    plugins: [
+      'external-helpers',
+      'transform-runtime', // async-await requires this
+      'transform-class-properties',
+      'transform-object-rest-spread'
+    ]
+  }),
+  {{/if}}
+  production && uglify(), // uglify only in production
+  filesize()
+]
+
+// project input files
+const inputs = [
+  {
+    // input file for building the bundle
+    input: 'src/main.js',
+    // output bundle file
+    output: {
+      file: 'dist/main.js',
+      {{#if (eq projectType "Command Line Tool")}}
+      banner: '#! /usr/bin/env node',
+      {{/if}}
+      format: 'cjs'
+    },
+    external,
+    plugins
+  }
+]
+
+export default inputs

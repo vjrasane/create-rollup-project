@@ -17,5 +17,9 @@ export default (opts: Options): Options => {
   opts.features.eslint && devDependencies.push('babel-eslint')
   opts.features.flow && devDependencies.push('babel-preset-flow')
 
-  return deepmerge(opts, { devDependencies })
+  return deepmerge(opts, {
+    package: {
+      devDependencies
+    }
+  })
 }

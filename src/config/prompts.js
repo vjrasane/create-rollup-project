@@ -101,9 +101,9 @@ export default async (defaults: Config, init: Config): Config => {
       name: answers.projectName,
       version: answers.projectVersion,
       author: answers.authorName,
-      description: answers.projectName + ' by ' + answers.authorName,
-      type: answers.projectType
+      description: answers.projectName + ' by ' + answers.authorName
     },
+    projectType: answers.projectType,
     features: answers.features
   })
 
