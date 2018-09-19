@@ -1,5 +1,5 @@
 /* @flow */
 
 it('test', (): void => {
-  console.log('Hello World!')
+  expect(true).toBeTruthy()
 })
