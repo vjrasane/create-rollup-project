@@ -62,18 +62,25 @@ const preFeatureProcess = (conf: Config): Config => {
   return processed
 }
 
-const postFeatureProcess = (conf: Config): Config => {
+const processDeps = (conf: Config, depType: string): Config => {
   const processed = { ...conf }
 
-  const devDeps = {}
-  conf.package.devDependencies.forEach(
-    d => (devDeps[d] = pkgJson.devDependencies[d])
-  )
-  processed.package.devDependencies = devDeps
+  if (conf.package[depType].length) {
+    const deps = {}
+    conf.package[depType].forEach(d => (deps[d] = pkgJson[depType][d]))
+    processed.package[depType] = deps
+  } else {
+    delete processed.package[depType]
+  }
+  return processed
+}
 
-  const deps = {}
-  conf.package.dependencies.forEach(d => (deps[d] = pkgJson.dependencies[d]))
-  processed.package.dependencies = deps
+const postFeatureProcess = (conf: Config): Config => {
+  let processed = { ...conf }
+
+  processed = processDeps(processed, 'dependencies')
+  processed = processDeps(processed, 'devDependencies')
+  processed = processDeps(processed, 'optionalDependencies')
 
   return processed
 }
@@ -111,6 +118,7 @@ export default async (args: Arguments): Promise<void> => {
           test: "echo 'Error: no test specified' && exit 1"
         },
         devDependencies: [],
+        optionalDependencies: [],
         dependencies: []
       },
       year: new Date().getFullYear(),

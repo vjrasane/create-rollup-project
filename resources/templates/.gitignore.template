@@ -13,7 +13,7 @@
 {{#if features.flow}}
 
 # flow
-/flow_typed
+/flow-typed
 {{/if}}
 
 # misc

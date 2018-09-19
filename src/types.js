@@ -9,6 +9,7 @@ export type Package = {
   license?: string,
   repository?: { type: string, url: string },
   devDependencies: Array<string> | Object,
+  optionalDependencies: Array<string> | Object,
   dependencies: Array<string> | Object
 }
 

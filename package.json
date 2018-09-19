@@ -2,20 +2,27 @@
   "name": "create-rollup-project",
   "version": "0.0.1",
   "description": "Creates a skeleton project with Rollup configuration as well as some other useful goodies",
-  "main": "dist/main.js",
-  "bin": {
-    "create-rollup-project": "dist/main.js"
-  },
-  "scripts": {
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "build": "cross-env NODE_ENV=production rollup -c",
-    "watch": "cross-env NODE_ENV=development rollup -c -w",
-    "lint": "node_modules/.bin/eslint .",
-    "test": "standard && cross-env NODE_ENV=development jest --coverage"
-  },
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vjrasane/create-rollup-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vjrasane/create-rollup-project/issues"
+  },
+  "homepage": "https://github.com/vjrasane/create-rollup-project#readme",
+  "author": "Ville Räsänen",
+  "bin": {
+    "create-rollup-project": "dist/main.js"
+  },
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rollup -c",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "format:pkg": "format-package -w",
+    "lint": "node_modules/.bin/eslint .",
+    "test": "standard && cross-env NODE_ENV=development jest --coverage",
+    "watch": "cross-env NODE_ENV=development rollup -c -w"
   },
   "keywords": [
     "template",
@@ -31,12 +38,39 @@
     "jest",
     "babel"
   ],
-  "author": "Ville Räsänen",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/vjrasane/create-rollup-project/issues"
+  "husky" : {
+    "hooks" : {
+      "pre-commit" : "lint-staged",
+      "pre-push" : "yarn test"
+    }
   },
-  "homepage": "https://github.com/vjrasane/create-rollup-project#readme",
+  "standard": {
+    "env": [
+      "jest",
+      "node"
+    ],
+    "ignore": [
+      "flow-typed/**"
+    ],
+    "parser": "babel-eslint",
+    "plugins": [
+      "flowtype"
+    ]
+  },
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5",
+    "deepmerge": "^2.1.1",
+    "enquirer": "^1.0.3",
+    "fs-extra": "^7.0.0",
+    "handlebars": "^4.0.12",
+    "parse-git-config": "^2.0.3",
+    "prompt-checkbox": "^2.2.0",
+    "prompt-confirm": "^2.0.4",
+    "prompt-list": "^3.2.0",
+    "tmp": "^0.0.33"
+  },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-eslint": "^9.0.0",
@@ -57,8 +91,9 @@
     "eslint-plugin-standard": "^4.0.0",
     "flow-bin": "^0.80.0",
     "flow-typed": "^2.5.1",
-    "husky": "^1.0.0-rc.13",
+    "format-package": "^4.5.0",
     "jest": "^23.5.0",
+    "lint-staged": "^7.2.2",
     "rollup": "^0.60.1",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.6",
@@ -69,32 +104,5 @@
     "rollup-plugin-progress": "^0.4.0",
     "rollup-plugin-uglify": "^4.0.0",
     "standard": "^12.0.1"
-  },
-  "standard": {
-    "parser": "babel-eslint",
-    "plugins": [
-      "flowtype"
-    ],
-    "ignore": [
-      "flow-typed/**"
-    ],
-    "env": [
-      "jest",
-      "node"
-    ]
-  },
-  "dependencies": {
-    "chalk": "^2.4.1",
-    "command-line-args": "^5.0.2",
-    "command-line-usage": "^5.0.5",
-    "deepmerge": "^2.1.1",
-    "enquirer": "^1.0.3",
-    "fs-extra": "^7.0.0",
-    "handlebars": "^4.0.12",
-    "parse-git-config": "^2.0.3",
-    "prompt-checkbox": "^2.2.0",
-    "prompt-confirm": "^2.0.4",
-    "prompt-list": "^3.2.0",
-    "tmp": "^0.0.33"
   }
 }

@@ -13,12 +13,13 @@ import { stdout } from '../logging'
 
 import type { Config } from '../types'
 
-const devDependencies = (
-  devDependencies: Array<string>
+const dependencies = (
+  deps: Array<string>,
+  depType: string
 ): ((conf: Config) => Config) => (conf: Config): Config => {
   return deepmerge(conf, {
     package: {
-      devDependencies
+      [depType || 'dependencies']: deps
     }
   })
 }
@@ -61,18 +62,20 @@ const features: Object = {
   dummies,
   license,
   flow: chain([
-    devDependencies(['flow-bin', 'flow-typed']),
+    dependencies(['flow-bin', 'flow-typed']),
     statics(['.flowconfig'])
   ]),
-  husky: chain([devDependencies(['husky']), statics(['husky.config.js'])]),
+  husky: chain([
+    dependencies(['husky'], 'optionalDependencies')
+  ]),
   travis: templates(['.travis.yml.template']),
   publish: statics(['.yarnignore']),
   readme: templates(['README.md.template']),
   coveralls: chain([
-    devDependencies(['coveralls']),
+    dependencies(['coveralls']),
     scripts({ coveralls: 'cat ./coverage/lcov.info | coveralls' })
   ]),
-  standard: devDependencies(['standard']),
+  standard: dependencies(['standard']),
   github: templates(['.gitignore.template'])
 }
 

@@ -10,7 +10,7 @@
 /dist
 
 # flow
-/flow_typed
+/flow-typed
 
 # misc
 .DS_Store

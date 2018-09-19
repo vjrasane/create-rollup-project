@@ -31,9 +31,23 @@
   },
   "homepage": "{{package.repository.url}}#readme",
   {{/if}}
+  {{#if package.dependencies}}
+  "dependencies": {
+    {{#each package.dependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  },
+  {{/if}}
   {{#if package.devDependencies}}
   "devDependencies": {
     {{#each package.devDependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  },
+  {{/if}}
+  {{#if package.optionalDependencies}}
+  "optionalDependencies": {
+    {{#each package.optionalDependencies}}
     "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
     {{/each}}
   },
