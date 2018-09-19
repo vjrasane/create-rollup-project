@@ -21,8 +21,6 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "format:pkg": "format-package -w",
     "lint": "node_modules/.bin/eslint .",
-    "precommit": "lint-staged",
-    "prepush": "yarn test",
     "test": "standard && cross-env NODE_ENV=development jest --coverage",
     "watch": "cross-env NODE_ENV=development rollup -c -w"
   },

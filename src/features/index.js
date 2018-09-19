@@ -5,7 +5,6 @@ import { grey } from 'chalk'
 import rollup from './rollup'
 import babel from './babel'
 import jest from './jest'
-import husky from './husky'
 import eslint from './eslint'
 import dummies from './dummies'
 import license from './license'
@@ -15,7 +14,7 @@ import { stdout } from '../logging'
 
 import type { Config } from '../types'
 
-const dependencies = (
+const deps = (
   deps: Array<string>,
   depType: string
 ): ((conf: Config) => Config) => (conf: Config): Config => {
@@ -26,26 +25,28 @@ const dependencies = (
   })
 }
 
-const scripts = (scripts: Object): ((conf: Config) => Config) => (
+const script = (key: string, value: string): ((conf: Config) => Config) => (
   conf: Config
 ): Config =>
   deepmerge(conf, {
     package: {
-      scripts
+      scripts: {
+        [key]: value
+      }
     }
   })
 
-const templates = (temps: Array<string>): ((conf: Config) => Config) => (
+const temp = (t: string): ((conf: Config) => Config) => (
   conf: Config
 ): Config => {
-  temps.forEach(t => template(t, conf))
+  template(t, conf)
   return conf
 }
 
-const statics = (statics: Array<string>): ((conf: Config) => Config) => (
+const stat = (s: string): ((conf: Config) => Config) => (
   conf: Config
 ): Config => {
-  statics.forEach(s => staticFile(s, conf))
+  staticFile(s, conf)
   return conf
 }
 
@@ -63,24 +64,24 @@ const features: Object = {
   eslint,
   dummies,
   license,
-  husky,
-  flow: chain([
-    dependencies(['flow-bin', 'flow-typed']),
-    statics(['.flowconfig'])
-  ]),
-  travis: templates(['.travis.yml.template']),
-  publish: statics(['.yarnignore']),
-  readme: templates(['README.md.template']),
-  coveralls: chain([
-    dependencies(['coveralls']),
-    scripts({ coveralls: 'cat ./coverage/lcov.info | coveralls' })
-  ]),
-  standard: dependencies(['standard']),
-  github: templates(['.gitignore.template']),
   'lint-staged': lintStaged,
+  husky: chain([
+    deps(['husky'], 'optionalDependencies'),
+    temp('husky.config.js.template')
+  ]),
+  flow: chain([deps(['flow-bin', 'flow-typed']), stat('.flowconfig')]),
+  travis: temp('.travis.yml.template'),
+  publish: stat('.yarnignore'),
+  readme: temp('README.md.template'),
+  coveralls: chain([
+    deps(['coveralls']),
+    script('coveralls', 'cat ./coverage/lcov.info | coveralls')
+  ]),
+  standard: deps(['standard']),
+  github: temp('.gitignore.template'),
   'format-package': chain([
-    dependencies(['format-package']),
-    scripts({ 'format:pkg': 'format-package -w' })
+    deps(['format-package']),
+    script('format:pkg', 'format-package -w')
   ])
 }
 

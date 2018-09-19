@@ -1,6 +1,7 @@
-{{#if features.babel}}const{{else}}var{{/if}} message = 'Hello {{package.name}}!'
-
-console.log(message)
+{{#if features.flow}}
+/* @flow */
+{{/if}}
+{{#if features.babel}}const{{else}}var{{/if}} message{{#if features.flow}}: string{{/if}} = 'Hello {{package.name}}!'
 
 {{#if features.babel}}
 export default message

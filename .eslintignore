@@ -1,4 +1,11 @@
-coverage/**
-dist/**
-node_modules/**
-flow-typed/**
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/dist
+
+# flow
+/flow-typed

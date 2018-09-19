@@ -1,6 +1,15 @@
-coverage/**
-dist/**
-node_modules/**
+# dependencies
+/node_modules
+
+# testing
+/coverage
+{{#if features.rollup}}
+
+# production
+/dist
+{{/if}}
 {{#if features.flow}}
-flow-typed/**
+
+# flow
+/flow-typed
 {{/if}}
