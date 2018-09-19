@@ -178,7 +178,6 @@ export default async (args: Arguments): Promise<void> => {
     conf = execFeats(conf)
     conf = postFeatureProcess(conf)
 
-    console.log(conf)
     // write package.json
     template('package.json.template', conf)
 
