@@ -21,8 +21,20 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "format:pkg": "format-package -w",
     "lint": "node_modules/.bin/eslint .",
+    "precommit": "lint-staged",
+    "prepush": "yarn test",
     "test": "standard && cross-env NODE_ENV=development jest --coverage",
     "watch": "cross-env NODE_ENV=development rollup -c -w"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "package.json": [
+      "format-package -w",
+      "git add"
+    ]
   },
   "keywords": [
     "template",
@@ -38,12 +50,6 @@
     "jest",
     "babel"
   ],
-  "husky" : {
-    "hooks" : {
-      "pre-commit" : "lint-staged",
-      "pre-push" : "yarn test"
-    }
-  },
   "standard": {
     "env": [
       "jest",
@@ -104,5 +110,8 @@
     "rollup-plugin-progress": "^0.4.0",
     "rollup-plugin-uglify": "^4.0.0",
     "standard": "^12.0.1"
+  },
+  "optionalDependencies": {
+    "husky": "^1.0.0-rc.14"
   }
 }

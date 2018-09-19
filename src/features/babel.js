@@ -2,9 +2,9 @@
 
 import deepmerge from 'deepmerge'
 
-import type { Options } from '../types'
+import type { Config } from '../types'
 
-export default (opts: Options): Options => {
+export default (conf: Config): Config => {
   const devDependencies: Array<string> = [
     'babel-core',
     'babel-preset-env',
@@ -14,10 +14,10 @@ export default (opts: Options): Options => {
     'babel-plugin-transform-runtime'
   ]
 
-  opts.features.eslint && devDependencies.push('babel-eslint')
-  opts.features.flow && devDependencies.push('babel-preset-flow')
+  conf.features.eslint && devDependencies.push('babel-eslint')
+  conf.features.flow && devDependencies.push('babel-preset-flow')
 
-  return deepmerge(opts, {
+  return deepmerge(conf, {
     package: {
       devDependencies
     }

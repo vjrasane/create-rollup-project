@@ -2,22 +2,6 @@
   "name": "{{package.name}}",
   "version": "{{package.version}}",
   "description": "{{package.description}}",
-  "main": "{{package.main}}",
-  {{#if (eq projectType "Command Line Tool")}}
-  "bin": {
-    "{{package.name}}": "{{package.main}}"
-  },
-  {{/if}}
-  {{#if package.scripts}}
-  "scripts": {
-  {{#each package.scripts}}
-    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
-  {{/each}}
-  },
-  {{/if}}
-  {{#if package.author}}
-  "author": "{{package.author}}",
-  {{/if}}
   {{#if package.license}}
   "license": "{{package.license}}",
   {{/if}}
@@ -31,28 +15,37 @@
   },
   "homepage": "{{package.repository.url}}#readme",
   {{/if}}
-  {{#if package.dependencies}}
-  "dependencies": {
-    {{#each package.dependencies}}
+  {{#if package.author}}
+  "author": "{{package.author}}",
+  {{/if}}
+  {{#if (eq projectType "Command Line Tool")}}
+  "bin": {
+    "{{package.name}}": "{{package.main}}"
+  },
+  {{/if}}
+  "main": "{{package.main}}",
+  {{#if package.scripts}}
+  "scripts": {
+  {{#each package.scripts}}
     "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+  {{/each}}
+  },
+  {{/if}}
+  {{#if features.lint-staged}}
+  "lint-staged": {
+    {{#each package.lint-staged}}
+    "{{@key}}": [
+    {{#each this}}
+      "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+    ]{{#unless @last}},{{/unless}}
     {{/each}}
   },
   {{/if}}
-  {{#if package.devDependencies}}
-  "devDependencies": {
-    {{#each package.devDependencies}}
-    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
-    {{/each}}
-  },
-  {{/if}}
-  {{#if package.optionalDependencies}}
-  "optionalDependencies": {
-    {{#each package.optionalDependencies}}
-    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
-    {{/each}}
-  },
-  {{/if}}
-  {{#if features.standard}}
+  "keywords": [
+    {{#if (eq projectType "Library")}}"library"{{else}}"command line"{{/if}}
+  ]
+  {{~#if features.standard}},
   "standard": {
     {{#if (or features.babel features.flow)}}
     "parser": "babel-eslint",
@@ -71,9 +64,21 @@
       {{/if}}
       "node"
     ]
-  },
+  }{{/if}}{{~#if package.dependencies}},
+  "dependencies": {
+    {{#each package.dependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  }{{/if}}{{~#if package.devDependencies}},
+  "devDependencies": {
+    {{#each package.devDependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  }{{/if}}{{~#if package.optionalDependencies}},
+  "optionalDependencies": {
+    {{#each package.optionalDependencies}}
+    "{{@key}}": "{{this}}"{{#unless @last}},{{/unless}}
+    {{/each}}
+  }
   {{/if}}
-  "keywords": [
-    {{#if (eq projectType "Library")}}"library"{{else}}"command line"{{/if}}
-  ]
 }

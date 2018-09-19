@@ -5,9 +5,11 @@ import { grey } from 'chalk'
 import rollup from './rollup'
 import babel from './babel'
 import jest from './jest'
+import husky from './husky'
 import eslint from './eslint'
 import dummies from './dummies'
 import license from './license'
+import lintStaged from './lint-staged'
 import { template, staticFile } from '../template'
 import { stdout } from '../logging'
 
@@ -19,7 +21,7 @@ const dependencies = (
 ): ((conf: Config) => Config) => (conf: Config): Config => {
   return deepmerge(conf, {
     package: {
-      [depType || 'dependencies']: deps
+      [depType || 'devDependencies']: deps
     }
   })
 }
@@ -61,12 +63,10 @@ const features: Object = {
   eslint,
   dummies,
   license,
+  husky,
   flow: chain([
     dependencies(['flow-bin', 'flow-typed']),
     statics(['.flowconfig'])
-  ]),
-  husky: chain([
-    dependencies(['husky'], 'optionalDependencies')
   ]),
   travis: templates(['.travis.yml.template']),
   publish: statics(['.yarnignore']),
@@ -76,7 +76,12 @@ const features: Object = {
     scripts({ coveralls: 'cat ./coverage/lcov.info | coveralls' })
   ]),
   standard: dependencies(['standard']),
-  github: templates(['.gitignore.template'])
+  github: templates(['.gitignore.template']),
+  'lint-staged': lintStaged,
+  'format-package': chain([
+    dependencies(['format-package']),
+    scripts({ 'format:pkg': 'format-package -w' })
+  ])
 }
 
 export default (conf: Config): Config =>

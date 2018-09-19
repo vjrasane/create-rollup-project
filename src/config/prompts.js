@@ -8,7 +8,7 @@ import { getGitUrl } from './defaults'
 import type { Config } from './types'
 
 const bundling: Array<string> = ['rollup', 'babel']
-const style: Array<string> = ['eslint', 'standard', 'flow']
+const style: Array<string> = ['eslint', 'standard', 'flow', 'lint-staged', 'format-package']
 const testing: Array<string> = ['jest', 'husky', 'travis', 'coveralls']
 const misc: Array<string> = [
   'dummies',

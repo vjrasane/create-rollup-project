@@ -3,22 +3,22 @@
 import deepmerge from 'deepmerge'
 import { staticFile, template } from '../template'
 
-import type { Options } from '../types'
+import type { Config } from '../types'
 
-export default (opts: Options): Options => {
+export default (conf: Config): Config => {
   const devDependencies: Array<string> = ['jest', 'cross-env']
 
   const scripts: { test: string } = {
     test:
-      (opts.features.standard ? 'standard && ' : '') +
+      (conf.features.standard ? 'standard && ' : '') +
       'cross-env NODE_ENV=development jest --coverage'
   }
 
-  staticFile('jest.config.js', opts)
+  staticFile('jest.config.js', conf)
 
-  opts.features.babel && template('.babelrc.template', opts)
+  conf.features.babel && template('.babelrc.template', conf)
 
-  return deepmerge(opts, {
+  return deepmerge(conf, {
     package: {
       scripts,
       devDependencies
