@@ -1,10 +1,12 @@
 module.exports = {
-  {{#if (or features.babel features.flow)}}
+  {{#eslint.babel}}
   parser: "babel-eslint",
-  {{/if}}
+  {{/eslint.babel}}
   extends: 'standard',
   env: {
-    {{#if features.jest}}jest : true,{{/if}}
+    {{#features.jest}}
+    jest : true,
+    {{/features.jest}}
     node: true
   },
   rules: {

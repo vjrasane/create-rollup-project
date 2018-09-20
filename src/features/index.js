@@ -5,12 +5,15 @@ import { grey } from 'chalk'
 import rollup from './rollup'
 import babel from './babel'
 import jest from './jest'
+import husky from './husky'
+import travis from './travis'
 import eslint from './eslint'
 import standard from './standard'
 import dummies from './dummies'
 import license from './license'
 import github from './github'
 import lintStaged from './lint-staged'
+import readme from './readme'
 import { template } from '../template'
 import { stdout } from '../logging'
 
@@ -70,14 +73,8 @@ const features = [
   ],
   // testing
   ['jest', jest],
-  [
-    'husky',
-    chain([
-      deps(['husky'], 'optionalDependencies'),
-      temp('husky.config.js.template')
-    ])
-  ],
-  ['travis', temp('.travis.yml.template')],
+  ['husky', husky],
+  ['travis', travis],
   [
     'coveralls',
     chain([
@@ -90,7 +87,7 @@ const features = [
   ['github', github], // github before readme
   ['license', license], // license before readme
   ['publish', temp('.yarnignore.template')], // publish before readme
-  ['readme', temp('README.md.template')]
+  ['readme', readme]
 ]
 
 export default (conf: Config): Config =>

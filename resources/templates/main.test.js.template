@@ -1,12 +1,13 @@
-{{#if features.flow}}
+{{#features.flow}}
 /* @flow */
-{{/if}}
-{{#if features.babel}}
+{{/features.flow}}
+{{#features.babel}}
 import message from '../src/main'
-{{else}}
+{{/features.babel}}
+{{^features.babel}}
 var message = require('../src/main')
-{{/if}}
+{{/features.babel}}
 
-it('Test', {{#if features.babel}}(){{#if features.flow}}: void{{/if}} =>{{else}}function (){{/if}} {
+it('Test', {{#features.babel}}(){{#features.flow}}: void{{/features.flow}} =>{{/features.babel}}{{^features.babel}}function (){{/features.babel}} {
   expect(message).toBe('Hello {{package.name}}!')
 })

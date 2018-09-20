@@ -1,21 +1,18 @@
 language: node_js
 node_js: 9
-{{#if (or features.coveralls features.rollup)}}
+{{#travis.afterSuccess}}
 after_success:
-{{/if}}
-{{#if features.coveralls}}
-- yarn coveralls
-{{/if}}
-{{#if features.rollup}}
-- yarn build
-{{/if}}
-{{#if features.publish}}
+{{#scripts}}
+- {{.}}
+{{/scripts}}
+{{/travis.afterSuccess}}
+{{#features.publish}}
 deploy:
   provider: npm
   skip_cleanup: true
   on:
     branch: master
     tags: true
-{{/if}}
+{{/features.publish}}
 cache: yarn
     

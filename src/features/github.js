@@ -6,7 +6,7 @@ import { template } from '../template'
 import type { Config } from '../types'
 
 export default (conf: Config): Config => {
-  const projectLink: string = conf.package.repository
+  const link: string = conf.package.repository
     .split('/') // split the URI to path parts
     .splice(-2) // take two last parts
     .join('/') // combine them back to a string
@@ -24,6 +24,8 @@ export default (conf: Config): Config => {
       },
       homepage: conf.package.repository + '#readme'
     },
-    projectLink
+    github: {
+      link
+    }
   })
 }

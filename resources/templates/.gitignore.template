@@ -5,16 +5,16 @@
 
 # testing
 /coverage
-{{#if features.rollup}}
+{{#features.rollup}}
 
 # production
 /dist
-{{/if}}
-{{#if features.flow}}
+{{/features.rollup}}
+{{#features.flow}}
 
 # flow
 /flow-typed
-{{/if}}
+{{/features.flow}}
 
 # misc
 .DS_Store

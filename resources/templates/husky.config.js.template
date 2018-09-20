@@ -1,6 +1,6 @@
 module.exports = {
   hooks: {
-    'pre-commit': '{{#if features.lint-staged}}lint-staged{{else if features.standard}}standard{{else if features.lint}}yarn lint{{else}}yarn test{{/if}}',
+    'pre-commit': '{{husky.precommit}}',
     'pre-push': 'yarn test'
   }
 }

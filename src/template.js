@@ -1,22 +1,22 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { mkdirpSync } from 'fs-extra'
 import { join, dirname } from 'path'
-import { compile, registerHelper } from 'handlebars'
-// import Mustache from 'mustache'
+// import { compile, registerHelper } from 'handlebars'
+import Mustache from 'mustache'
 import type { Config } from './types'
 
-registerHelper({
-  // 'arguments' is only available in anonymous functions, not in arrow functions
-  or: function () {
-    return Array.prototype.slice.call(arguments, 0, -1).some(Boolean)
-  },
-  and: function () {
-    return Array.prototype.slice.call(arguments, 0, -1).every(Boolean)
-  },
-  eq: function (first, second) {
-    return first === second
-  }
-})
+// registerHelper({
+//   // 'arguments' is only available in anonymous functions, not in arrow functions
+//   or: function () {
+//     return Array.prototype.slice.call(arguments, 0, -1).some(Boolean)
+//   },
+//   and: function () {
+//     return Array.prototype.slice.call(arguments, 0, -1).every(Boolean)
+//   },
+//   eq: function (first, second) {
+//     return first === second
+//   }
+// })
 
 const read = (name: string, dir: string): string => {
   const templatePath: string = join(
@@ -38,7 +38,8 @@ export const template = (
   conf: Config,
   target: string
 ): string => {
-  const contents = compile(read(name), { noEscape: true })(conf)
+  // const contents = compile(read(name), { noEscape: true })(conf)
+  const contents = Mustache.render(read(name), conf)
   const targetPath = join(
     conf.tmpDir,
     target ||

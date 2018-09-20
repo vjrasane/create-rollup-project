@@ -1,10 +1,11 @@
-{{#if features.flow}}
+{{#features.flow}}
 /* @flow */
-{{/if}}
-{{#if features.babel}}const{{else}}var{{/if}} message{{#if features.flow}}: string{{/if}} = 'Hello {{package.name}}!'
+{{/features.flow}}
+{{#features.babel}}const{{/features.babel}}{{^features.babel}}var{{/features.babel}} message{{#features.flow}}: string{{/features.flow}} = 'Hello {{package.name}}!'
 
-{{#if features.babel}}
+{{#features.babel}}
 export default message
-{{else}}
+{{/features.babel}}
+{{^features.babel}}
 module.exports = message
-{{/if}}
+{{/features.babel}}

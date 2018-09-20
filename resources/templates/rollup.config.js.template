@@ -1,4 +1,4 @@
-{{#if features.babel}}import babel from 'rollup-plugin-babel'{{/if}}
+{{#features.babel}}import babel from 'rollup-plugin-babel'{{/features.babel}}
 import resolve from 'rollup-plugin-node-resolve'
 import builtins from 'rollup-plugin-node-builtins'
 import commonjs from 'rollup-plugin-commonjs'
@@ -33,14 +33,14 @@ const plugins = [
   * an external dependency.
   */
   resolve(),
-  {{#if features.babel}}
+  {{#features.babel}}
   babel({
     /*
     * Babel has to be configured separately for rollup, because we cannot use module transformers with it, which
     * in turn are required by Jest, which will read its configuration from .babelrc
     */
     babelrc: false,
-    presets: [['env', { modules: false }]{{#if features.flow}}, 'flow'{{/if}}],
+    presets: [['env', { modules: false }]{{#features.flow}}, 'flow'{{/features.flow}}],
     exclude: ['node_modules/**', '*.json'], // only transpile our source code
     runtimeHelpers: true, // otherwise transform-runtime throws an error
     plugins: [
@@ -50,7 +50,7 @@ const plugins = [
       'transform-object-rest-spread'
     ]
   }),
-  {{/if}}
+  {{/features.babel}}
   production && uglify(), // uglify only in production
   filesize()
 ]
@@ -63,9 +63,9 @@ const inputs = [
     // output bundle file
     output: {
       file: 'dist/main.js',
-      {{#if (eq projectType "Command Line Tool")}}
+      {{#rollup.cli}}
       banner: '#! /usr/bin/env node',
-      {{/if}}
+      {{/rollup.cli}}
       format: 'cjs'
     },
     external,
