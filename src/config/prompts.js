@@ -125,10 +125,7 @@ export default async (defaults: Config, init: Config): Config => {
   const extraQuestions = {
     github: async opts => {
       const { githubUrl }: string = await enquirer.ask('githubUrl')
-      opts.package.repository = {
-        type: 'git',
-        url: githubUrl
-      }
+      opts.package.repository = githubUrl
     },
     license: async opts => {
       let { license }: string = await enquirer.ask('license')

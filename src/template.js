@@ -2,6 +2,8 @@ import { readFileSync, writeFileSync } from 'fs'
 import { mkdirpSync } from 'fs-extra'
 import { join, dirname } from 'path'
 import { compile, registerHelper } from 'handlebars'
+// import Mustache from 'mustache'
+import type { Config } from './types'
 
 registerHelper({
   // 'arguments' is only available in anonymous functions, not in arrow functions
@@ -26,34 +28,24 @@ const read = (name: string, dir: string): string => {
   return contents
 }
 
-const writeFile = (contents: string, target: string) => {
+export const write = (contents: string, target: string) => {
   mkdirpSync(dirname(target)) // create dirs if they dont exist
   writeFileSync(target, contents)
 }
 
-export const staticFile = (
-  name: string,
-  opts: Object<string>,
-  target: string
-) => {
-  const contents = read(name, 'resources/static')
-  const targetPath = join(opts.tmpDir, target || name)
-  writeFile(contents, targetPath)
-}
-
 export const template = (
   name: string,
-  opts: Object<string>,
+  conf: Config,
   target: string
 ): string => {
-  const contents = compile(read(name), { noEscape: true })(opts)
+  const contents = compile(read(name), { noEscape: true })(conf)
   const targetPath = join(
-    opts.tmpDir,
+    conf.tmpDir,
     target ||
       name
         .split('.')
         .slice(0, -1)
         .join('.')
   )
-  writeFile(contents, targetPath)
+  write(contents, targetPath)
 }

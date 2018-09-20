@@ -1,7 +1,7 @@
 /* @flow */
 
 import deepmerge from 'deepmerge'
-import { staticFile, template } from '../template'
+import { template } from '../template'
 
 import type { Config } from '../types'
 
@@ -14,7 +14,7 @@ export default (conf: Config): Config => {
       'cross-env NODE_ENV=development jest --coverage'
   }
 
-  staticFile('jest.config.js', conf)
+  template('jest.config.js.template', conf)
 
   conf.features.babel && template('.babelrc.template', conf)
 

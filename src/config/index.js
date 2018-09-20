@@ -1,9 +1,9 @@
 /* @flow */
 
 import deepmerge from 'deepmerge'
+import format from 'format-package'
 import { basename, join, isAbsolute } from 'path'
 import { existsSync, statSync } from 'fs'
-
 import { userInfo } from 'os'
 import { dirSync } from 'tmp'
 import { mkdirpSync, removeSync, copySync } from 'fs-extra'
@@ -11,7 +11,7 @@ import List from 'prompt-list'
 import Confirm from 'prompt-confirm'
 
 import { info, warn, divider } from '../logging'
-import { template } from '../template'
+import { write } from '../template'
 import execFeats from '../features'
 import pkgJson from '../../package'
 
@@ -44,22 +44,18 @@ const confirmOverwrite = (): Promise<boolean> =>
   }).run()
 
 const preFeatureProcess = (conf: Config): Config => {
-  const processed = { ...conf }
-
   const features = {}
   conf.features.forEach(f => {
     features[f] = true
   })
-  processed.features = features
+  return { ...conf, features }
+}
 
-  if (conf.package.repository) {
-    processed.projectLink = conf.package.repository.url
-      .split('/') // split the URI to path parts
-      .splice(-2) // take two last parts
-      .join('/') // combine them back to a string
-  }
-
-  return processed
+const findDep = (dep: string) => {
+  const deps = ['dependencies', 'devDependencies', 'optionalDependencies'].find(
+    d => dep in pkgJson[d]
+  )
+  return pkgJson[deps][dep]
 }
 
 const processDeps = (conf: Config, depType: string): Config => {
@@ -67,11 +63,12 @@ const processDeps = (conf: Config, depType: string): Config => {
 
   if (conf.package[depType].length) {
     const deps = {}
-    conf.package[depType].forEach(d => (deps[d] = pkgJson[depType][d]))
+    conf.package[depType].forEach(d => (deps[d] = findDep(d)))
     processed.package[depType] = deps
   } else {
     delete processed.package[depType]
   }
+
   return processed
 }
 
@@ -81,6 +78,12 @@ const postFeatureProcess = (conf: Config): Config => {
   processed = processDeps(processed, 'dependencies')
   processed = processDeps(processed, 'devDependencies')
   processed = processDeps(processed, 'optionalDependencies')
+
+  if (conf.projectType === 'Command Line Tool') {
+    processed.package.bin = {
+      [conf.package.name]: conf.package.main
+    }
+  }
 
   return processed
 }
@@ -187,7 +190,7 @@ export default async (args: Arguments): Promise<void> => {
     conf = postFeatureProcess(conf)
 
     // write package.json
-    template('package.json.template', conf)
+    write(await format(conf.package), join(tmpDir.name, 'package.json'))
 
     const copyFiles = (): void => {
       // make sure target dir exists

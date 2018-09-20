@@ -46,9 +46,6 @@ export const getGitUrl = (conf: Conf): string => {
 export default (defaults: Conf, init: Conf): Conf =>
   deepmerge(defaults, {
     package: {
-      repository: {
-        type: 'git',
-        url: getGitUrl(init)
-      }
+      repository: getGitUrl(init)
     }
   })

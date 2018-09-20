@@ -6,10 +6,12 @@ import rollup from './rollup'
 import babel from './babel'
 import jest from './jest'
 import eslint from './eslint'
+import standard from './standard'
 import dummies from './dummies'
 import license from './license'
+import github from './github'
 import lintStaged from './lint-staged'
-import { template, staticFile } from '../template'
+import { template } from '../template'
 import { stdout } from '../logging'
 
 import type { Config } from '../types'
@@ -43,13 +45,6 @@ const temp = (t: string): ((conf: Config) => Config) => (
   return conf
 }
 
-const stat = (s: string): ((conf: Config) => Config) => (
-  conf: Config
-): Config => {
-  staticFile(s, conf)
-  return conf
-}
-
 const chain = (
   funcs: Array<(conf: Config) => Config>
 ): ((conf: Config) => Config) => (conf: Config): Config => {
@@ -57,40 +52,53 @@ const chain = (
   return res
 }
 
-const features: Object = {
-  rollup,
-  babel,
-  jest,
-  eslint,
-  dummies,
-  license,
-  'lint-staged': lintStaged,
-  husky: chain([
-    deps(['husky'], 'optionalDependencies'),
-    temp('husky.config.js.template')
-  ]),
-  flow: chain([deps(['flow-bin', 'flow-typed']), stat('.flowconfig')]),
-  travis: temp('.travis.yml.template'),
-  publish: stat('.yarnignore'),
-  readme: temp('README.md.template'),
-  coveralls: chain([
-    deps(['coveralls']),
-    script('coveralls', 'cat ./coverage/lcov.info | coveralls')
-  ]),
-  standard: deps(['standard']),
-  github: temp('.gitignore.template'),
-  'format-package': chain([
-    deps(['format-package']),
-    script('format:pkg', 'format-package -w')
-  ])
-}
+const features = [
+  // bundling
+  ['rollup', rollup],
+  ['babel', babel],
+  // style
+  ['eslint', eslint],
+  ['standard', standard],
+  [
+    'flow',
+    chain([deps(['flow-bin', 'flow-typed']), temp('.flowconfig.template')])
+  ],
+  ['lint-staged', lintStaged],
+  [
+    'format-package',
+    chain([deps(['format-package']), script('format:pkg', 'format-package -w')])
+  ],
+  // testing
+  ['jest', jest],
+  [
+    'husky',
+    chain([
+      deps(['husky'], 'optionalDependencies'),
+      temp('husky.config.js.template')
+    ])
+  ],
+  ['travis', temp('.travis.yml.template')],
+  [
+    'coveralls',
+    chain([
+      deps(['coveralls']),
+      script('coveralls', 'cat ./coverage/lcov.info | coveralls')
+    ])
+  ],
+  // misc
+  ['dummies', dummies],
+  ['github', github], // github before readme
+  ['license', license], // license before readme
+  ['publish', temp('.yarnignore.template')], // publish before readme
+  ['readme', temp('README.md.template')]
+]
 
 export default (conf: Config): Config =>
-  Object.keys(features).reduce((acc, curr) => {
-    if (curr in conf.features) {
-      stdout(' * ' + curr)
-      return features[curr](acc)
+  features.reduce((acc, /* array destructuring */ [feat, func]) => {
+    if (feat in conf.features) {
+      stdout(' * ' + feat)
+      return func(acc)
     }
-    stdout(grey(' * ' + curr + ' (skipped)'))
+    stdout(grey(' * ' + feat + ' (skipped)'))
     return acc
   }, conf)

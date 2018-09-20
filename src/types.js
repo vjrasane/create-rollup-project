@@ -7,7 +7,7 @@ export type Package = {
   main?: string,
   scripts?: Object,
   license?: string,
-  repository?: { type: string, url: string },
+  repository?: string | { type: string, url: string },
   devDependencies: Array<string> | Object,
   optionalDependencies: Array<string> | Object,
   dependencies: Array<string> | Object

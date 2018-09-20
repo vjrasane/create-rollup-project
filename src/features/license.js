@@ -1,25 +1,21 @@
 /* @flow */
 
-import { staticFile, template } from '../template'
+import { template } from '../template'
 import { join, dirname } from 'path'
 import { existsSync } from 'fs'
 
 import type { Config } from '../types'
 
-export default (opts: Config): Config => {
-  const license: string = opts.package.license
+export default (conf: Config): Config => {
+  const license: string = conf.package.license
 
-  const findLicense = (dir: string, handler: (path: string, opts: Config, name: string) => void): void => {
-    const resPath: string = join('licenses', license)
-    const absPath: string = join(dirname(dirname(module.filename)), 'resources', dir, resPath)
-    if (existsSync(absPath)) {
-      handler(resPath, opts, 'LICENSE')
-    }
+  conf.licenseEnc = conf.package.license.replace(/-/g, '%20')
+
+  const resPath: string = join('licenses', license)
+  const absPath: string = join(dirname(dirname(module.filename)), 'resources/templates', resPath)
+  if (existsSync(absPath)) {
+    template(resPath, conf, 'LICENSE')
   }
 
-  findLicense('static', staticFile)
-  findLicense('templates', template)
-
-  opts.licenseEnc = opts.package.license.replace(/-/g, '%20')
-  return opts
+  return conf
 }
