@@ -280,6 +280,11 @@ ansi-colors@^0.2.0:
     ansi-yellow "^0.1.1"
     lazy-cache "^2.0.1"
 
+ansi-colors@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.1.1.tgz#cbb9ae256bf750af1eab344f229aa27fe94ba348"
+  integrity sha512-JoX0apGbHaUJBNl6yF+p6JAFYZ666/hhCGKN5t9QFjbJQKUU/g8MNbFDbvfrgKXvI1QpZplPOnwIo99lX/AAmA==
+
 ansi-cyan@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ansi-cyan/-/ansi-cyan-0.1.1.tgz#538ae528af8982f28ae30d86f2f17456d2609873"
@@ -404,10 +409,6 @@ any-observable@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/any-observable/-/any-observable-0.3.0.tgz#af933475e5806a67d0d7df090dd5e8bef65d119b"
 
-any-promise@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/any-promise/-/any-promise-0.1.0.tgz#830b680aa7e56f33451d4b049f3bd8044498ee27"
-
 anymatch@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/anymatch/-/anymatch-2.0.0.tgz#bcb24b4f37934d9aa7ac17b4adaf89e7c76ef2eb"
@@ -455,7 +456,7 @@ arr-diff@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/arr-diff/-/arr-diff-4.0.0.tgz#d6461074febfec71e7e15235761a329a5dc7c520"
 
-arr-flatten@^1.0.1, arr-flatten@^1.0.3, arr-flatten@^1.1.0:
+arr-flatten@^1.0.1, arr-flatten@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/arr-flatten/-/arr-flatten-1.1.0.tgz#36048bbff4e7b47e136644316c99669ea5ae91f1"
 
@@ -1526,15 +1527,6 @@ cliui@^4.0.0:
     strip-ansi "^4.0.0"
     wrap-ansi "^2.0.0"
 
-clone-deep@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/clone-deep/-/clone-deep-0.3.0.tgz#348c61ae9cdbe0edfe053d91ff4cc521d790ede8"
-  dependencies:
-    for-own "^1.0.0"
-    is-plain-object "^2.0.1"
-    kind-of "^3.2.2"
-    shallow-clone "^0.1.2"
-
 clone-deep@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/clone-deep/-/clone-deep-1.0.0.tgz#b2f354444b5d4a0ce58faca337ef34da2b14a6c7"
@@ -2010,22 +2002,12 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-enquirer@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/enquirer/-/enquirer-1.0.3.tgz#03ea667aaf241b21e4b1db938dfa3e0b18bd8924"
+enquirer@^2.0.0:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/enquirer/-/enquirer-2.3.6.tgz#2a7fe5dd634a1e4125a975ec994ff5456dc3734d"
+  integrity sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==
   dependencies:
-    choices-separator "^2.0.0"
-    collection-visit "^1.0.0"
-    component-emitter "^1.2.1"
-    debug "^2.6.8"
-    extend-shallow "^2.0.1"
-    get-value "^2.0.6"
-    isobject "^3.0.0"
-    promise-reduce "^2.1.0"
-    prompt-input "^3.0.0"
-    prompt-question "^3.0.3"
-    readline-ui "^2.2.2"
-    set-value "^1.0.0"
+    ansi-colors "^4.1.1"
 
 errno@^0.1.1, errno@~0.1.1:
   version "0.1.7"
@@ -2890,7 +2872,7 @@ gzip-size@^3.0.0:
   dependencies:
     duplexer "^0.1.1"
 
-handlebars@^4.0.12, handlebars@^4.0.3:
+handlebars@^4.0.3:
   version "4.0.12"
   resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.0.12.tgz#2c15c8a96d46da5e266700518ba8cb8d919d5bc5"
   dependencies:
@@ -3193,7 +3175,7 @@ is-arrayish@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/is-arrayish/-/is-arrayish-0.2.1.tgz#77c99840527aa8ecb1a8ba697b80645a7a926a9d"
 
-is-buffer@^1.0.2, is-buffer@^1.1.5, is-buffer@~1.1.1:
+is-buffer@^1.1.5, is-buffer@~1.1.1:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
 
@@ -3938,13 +3920,7 @@ jsx-ast-utils@^2.0.1:
   dependencies:
     array-includes "^3.0.3"
 
-kind-of@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-2.0.1.tgz#018ec7a4ce7e3a86cb9141be519d24c8faa981b5"
-  dependencies:
-    is-buffer "^1.0.2"
-
-kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0, kind-of@^3.2.2:
+kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
   dependencies:
@@ -3972,11 +3948,7 @@ koalas@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/koalas/-/koalas-1.0.2.tgz#318433f074235db78fae5661a02a8ca53ee295cd"
 
-lazy-cache@^0.2.3:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/lazy-cache/-/lazy-cache-0.2.7.tgz#7feddf2dcb6edb77d11ef1d117ab5ffdf0ab1b65"
-
-lazy-cache@^2.0.1, lazy-cache@^2.0.2:
+lazy-cache@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/lazy-cache/-/lazy-cache-2.0.2.tgz#b9190a4f913354694840859f8a8f7084d8822264"
   dependencies:
@@ -5043,12 +5015,6 @@ progress@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.0.tgz#8a1be366bf8fc23db2bd23f10c6fe920b4389d1f"
 
-promise-reduce@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/promise-reduce/-/promise-reduce-2.1.0.tgz#77198731b5c62cbd5f8e1845511131d00e3b6c47"
-  dependencies:
-    any-promise "^0.1.0"
-
 prompt-actions@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/prompt-actions/-/prompt-actions-3.0.2.tgz#537eee52241c940379f354a06eae8528e44ceeba"
@@ -5076,28 +5042,6 @@ prompt-checkbox@^2.2.0:
     ansi-cyan "^0.1.1"
     debug "^2.6.8"
     prompt-base "^4.0.2"
-
-prompt-choices@^3.0.3:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/prompt-choices/-/prompt-choices-3.0.6.tgz#5c35c3d99ee17edfd9563c1fb81046b0849ef8ff"
-  dependencies:
-    arr-flatten "^1.0.3"
-    choices-separator "^2.0.0"
-    clone-deep "^0.3.0"
-    collection-visit "^1.0.0"
-    debug "^2.6.8"
-    define-property "^1.0.0"
-    extend-shallow "^2.0.1"
-    is-number "^3.0.0"
-    kind-of "^4.0.0"
-    lazy-cache "^2.0.2"
-    log-utils "^0.2.1"
-    pointer-symbol "^1.0.0"
-    radio-symbol "^2.0.0"
-    set-value "^1.0.0"
-    strip-color "^0.1.0"
-    terminal-paginator "^2.0.0"
-    toggle-array "^1.0.1"
 
 prompt-choices@^4.0.5:
   version "4.1.0"
@@ -5127,13 +5071,6 @@ prompt-confirm@^2.0.4:
     ansi-cyan "^0.1.1"
     prompt-base "^4.0.1"
 
-prompt-input@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/prompt-input/-/prompt-input-3.0.0.tgz#f509e44713223f85268e70585ddae5df68d79027"
-  dependencies:
-    debug "^2.6.8"
-    prompt-base "^4.0.2"
-
 prompt-list@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/prompt-list/-/prompt-list-3.2.0.tgz#b33472e01677a5751f59094fa7fe20b09da9db94"
@@ -5141,18 +5078,6 @@ prompt-list@^3.2.0:
     ansi-cyan "^0.1.1"
     ansi-dim "^0.1.1"
     prompt-radio "^1.2.1"
-
-prompt-question@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/prompt-question/-/prompt-question-3.0.3.tgz#c55858bd76b1878c1eaaecb917a928a9c13c8a37"
-  dependencies:
-    clone-deep "^0.3.0"
-    debug "^2.6.8"
-    define-property "^1.0.0"
-    extend-shallow "^2.0.1"
-    kind-of "^4.0.0"
-    koalas "^1.0.2"
-    prompt-choices "^3.0.3"
 
 prompt-question@^5.0.1:
   version "5.0.2"
@@ -5357,7 +5282,7 @@ readable-stream@~2.1.5:
     string_decoder "~0.10.x"
     util-deprecate "~1.0.1"
 
-readline-ui@^2.2.2, readline-ui@^2.2.3:
+readline-ui@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/readline-ui/-/readline-ui-2.2.3.tgz#9e873a7668bbd8ca8a5573ce810a6bafb70a5089"
   dependencies:
@@ -5755,15 +5680,6 @@ set-value@^0.4.3:
     is-plain-object "^2.0.1"
     to-object-path "^0.3.0"
 
-set-value@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/set-value/-/set-value-1.0.0.tgz#bcc76f71a0f1e07a24b987d0a02afec9f665304f"
-  dependencies:
-    extend-shallow "^2.0.1"
-    is-extendable "^0.1.1"
-    is-plain-object "^2.0.1"
-    to-object-path "^0.3.0"
-
 set-value@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-value/-/set-value-2.0.0.tgz#71ae4a88f0feefbbf52d1ea604f3fb315ebb6274"
@@ -5789,15 +5705,6 @@ sha.js@^2.4.0, sha.js@^2.4.8:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
-
-shallow-clone@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/shallow-clone/-/shallow-clone-0.1.2.tgz#5909e874ba77106d73ac414cfec1ffca87d97060"
-  dependencies:
-    is-extendable "^0.1.1"
-    kind-of "^2.0.1"
-    lazy-cache "^0.2.3"
-    mixin-object "^2.0.1"
 
 shallow-clone@^1.0.0:
   version "1.0.0"
@@ -6194,7 +6101,7 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
-terminal-paginator@^2.0.0, terminal-paginator@^2.0.2:
+terminal-paginator@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/terminal-paginator/-/terminal-paginator-2.0.2.tgz#967e66056f28fe8f55ba7c1eebfb7c3ef371c1d3"
   dependencies:
