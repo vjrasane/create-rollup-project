@@ -67,7 +67,7 @@
     "command-line-usage": "^5.0.5",
     "deepmerge": "^2.1.1",
     "enquirer": "^1.0.3",
-    "format-package": "^4.5.0",
+    "format-package": "^6.0.0",
     "fs-extra": "^7.0.0",
     "mustache": "^3.0.0",
     "parse-git-config": "^2.0.3",
